@@ -730,6 +730,15 @@
     .member-item { transition: background .15s, transform .15s; }
     .member-item:hover { transform: translateX(2px); }
 
+    /* -- Copyright text -- */
+    .copyright {
+      text-align: center; font-size: 11px; color: var(--text-muted);
+      padding: 12px 0 0; opacity: 0.5;
+      letter-spacing: 0.3px;
+    }
+    .copyright a { color: var(--text-muted); text-decoration: none; }
+    .copyright a:hover { color: #fff; }
+
     /* -- Thunder lightning background -- */
     #lightning-canvas {
       position: fixed; inset: 0; z-index: -1;
@@ -954,6 +963,7 @@
     <div id="login-form">
       <h2>Welcome!</h2>
       <p class="subtitle">Log in to your study room account</p>
+      <p class="copyright">&copy; 2026 Study Room &mdash; Built by <a href="https://github.com/anbuselvannnnn" target="_blank">Anbuselvan</a></p>
       <div class="auth-error" id="login-error"></div>
       <div class="form-group">
         <label>Username</label>
@@ -1073,6 +1083,7 @@
         </div>
       </div>
 
+      <div class="copyright" style="padding: 4px 12px;">&copy; 2026 Study Room</div>
       <div class="sidebar-user">
         <div class="profile-pic-wrap" title="Change profile picture">
           <div class="avatar" id="user-avatar" onclick="viewOwnProfilePic(event)">?</div>
