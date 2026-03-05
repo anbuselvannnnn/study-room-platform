@@ -894,6 +894,11 @@
       padding: 1px 6px; border-radius: 10px; font-weight: 700;
       margin-left: 4px; letter-spacing: .5px;
     }
+    .msg.nerd-msg .text {
+      font-size: 13px; color: #aab;
+      line-height: 1.45;
+    }
+    .msg.nerd-msg .username { color: #99aaff; }
 
     /* ---- FORWARD MODAL ---- */
     .forward-modal {
@@ -2380,7 +2385,7 @@
     if (welcome) welcome.remove();
 
     const div = document.createElement("div");
-    div.className = "msg";
+    div.className = "msg" + ((msg.sender || "").toLowerCase() === "nerd" ? " nerd-msg" : "");
     div.setAttribute("data-msg-id", msg._id);
     if (msg.senderId) div.setAttribute("data-sender-id", msg.senderId);
     if (msg.pinned) div.style.borderLeft = "3px solid #f5c842";
