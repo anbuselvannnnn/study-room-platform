@@ -1,0 +1,3109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-tertiary: #181818;
+      --bg-input: #1e1e1e;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #777777;
+      --accent: #ffffff;
+      --accent-hover: #d4d4d4;
+      --green: #ffffff;
+      --green-bg: #2a2a2a;
+      --red: #ff4444;
+      --red-hover: #cc3333;
+      --border: #2a2a2a;
+      --hover: rgba(255,255,255,0.05);
+      --radius: 8px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ============ APP SHELL ============ */
+    .app {
+      width: 1060px; max-width: 98vw;
+      height: 94vh; max-height: 780px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      display: flex; overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.7);
+      margin: 0 auto;
+    }
+
+    /* ============ SCREENS ============ */
+    .screen { display: none; width: 100%; }
+    .screen.active { display: flex; align-items: center; justify-content: center; }
+
+    /* ---- AUTH SCREEN ---- */
+    .auth-card {
+      background: var(--bg-tertiary);
+      padding: 36px 40px; border-radius: 12px;
+      width: 420px; max-width: 95%;
+      border: 1px solid var(--border);
+      margin: 0 auto;
+    }
+    .auth-card h2 { font-size: 22px; text-align: center; margin-bottom: 4px; color: #fff; }
+    .auth-card .subtitle { color: var(--text-muted); font-size: 13px; text-align: center; margin-bottom: 24px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block; font-size: 11px; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: .5px; margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%; padding: 10px 12px; border-radius: var(--radius);
+      border: 1px solid var(--border); outline: none; background: var(--bg-input);
+      color: var(--text-primary); font-size: 14px; font-family: inherit;
+      transition: border-color .2s;
+    }
+    .form-group input:focus { border-color: #555; }
+    .form-group input::placeholder { color: var(--text-muted); }
+
+    .btn {
+      width: 100%; padding: 11px; border: none; border-radius: var(--radius);
+      font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background .15s, transform .1s, opacity .15s; margin-top: 6px;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn-accent { background: #fff; color: #000; }
+    .btn-accent:hover { background: #e0e0e0; }
+    .btn-green { background: #2a2a2a; color: #fff; border: 1px solid #444; }
+    .btn-green:hover { background: #333; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-red:hover { background: var(--red-hover); }
+    .btn-ghost {
+      background: transparent; color: var(--text-muted);
+      font-size: 13px; margin-top: 12px;
+    }
+    .btn-ghost:hover { color: #fff; }
+
+    .auth-error {
+      color: var(--red); font-size: 13px; text-align: center;
+      margin-bottom: 10px; min-height: 18px;
+    }
+
+    /* ---- SIDEBAR ---- */
+    .sidebar {
+      width: 270px; min-width: 270px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+    }
+    .sidebar-header {
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sidebar-header h3 { font-size: 14px; font-weight: 700; color: #fff; }
+
+    /* Sidebar tabs */
+    .sidebar-tabs {
+      display: flex; border-bottom: 1px solid var(--border);
+    }
+    .sidebar-tab {
+      flex: 1; padding: 10px; text-align: center;
+      font-size: 12px; font-weight: 600; color: var(--text-muted);
+      background: transparent; border: none; cursor: pointer;
+      border-bottom: 2px solid transparent; transition: all .15s;
+      font-family: inherit;
+    }
+    .sidebar-tab.active { color: #fff; border-bottom-color: #fff; }
+    .sidebar-tab:hover { color: #ccc; }
+
+    .sidebar-user {
+      padding: 10px 16px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      margin-top: auto;
+    }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #333; display: flex; align-items: center;
+      justify-content: center; font-size: 14px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .sidebar-user .uname { font-size: 13px; font-weight: 600; color: #fff; }
+    .sidebar-user .uemail { font-size: 11px; color: var(--text-muted); }
+    .logout-btn {
+      margin-left: auto; background: transparent; border: none;
+      color: var(--text-muted); cursor: pointer; font-size: 16px;
+      padding: 4px 6px; border-radius: 4px;
+    }
+    .logout-btn:hover { color: var(--red); background: rgba(255,68,68,.1); }
+
+    /* Room actions row */
+    .room-actions {
+      padding: 10px 12px; display: flex; gap: 6px;
+    }
+    .room-actions button {
+      flex: 1; padding: 8px; border: none; border-radius: 6px;
+      font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-create { background: #fff; color: #000; }
+    .btn-create:hover { background: #e0e0e0; }
+    .btn-join-action { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-join-action:hover { background: #282828; }
+
+    /* Room list */
+    .room-list {
+      flex: 1; overflow-y: auto; padding: 4px 8px;
+    }
+    .room-list::-webkit-scrollbar { width: 4px; }
+    .room-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .room-item {
+      padding: 10px 12px; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; gap: 10px;
+      transition: background .12s; margin-bottom: 2px;
+    }
+    .room-item:hover { background: var(--hover); }
+    .room-item.active { background: rgba(255,255,255,.08); }
+    .room-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--bg-input); display: flex; align-items: center;
+      justify-content: center; font-size: 16px; color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .room-item .rname { font-size: 14px; font-weight: 600; color: #fff; }
+    .room-item .rcode { font-size: 11px; color: var(--text-muted); }
+    .room-empty {
+      text-align: center; padding: 30px 16px;
+      color: var(--text-muted); font-size: 13px;
+    }
+
+    /* Explore tab content */
+    .explore-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .explore-panel.active { display: flex; }
+    .rooms-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .rooms-panel.active { display: flex; }
+
+    .explore-search {
+      padding: 10px 12px;
+    }
+    .explore-search input {
+      width: 100%; padding: 8px 12px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--bg-input);
+      color: #fff; font-family: inherit; font-size: 13px; outline: none;
+    }
+    .explore-search input:focus { border-color: #555; }
+    .explore-search input::placeholder { color: var(--text-muted); }
+    .explore-results {
+      flex: 1; overflow-y: auto; padding: 4px 8px;
+    }
+    .explore-results::-webkit-scrollbar { width: 4px; }
+    .explore-results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .explore-room-item {
+      padding: 10px 12px; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; gap: 10px;
+      transition: background .12s; margin-bottom: 2px;
+    }
+    .explore-room-item:hover { background: var(--hover); }
+    .explore-room-meta { flex: 1; min-width: 0; }
+    .explore-room-meta .ername { font-size: 14px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .explore-room-meta .ermeta { font-size: 11px; color: var(--text-muted); }
+    .explore-btns { display: flex; gap: 4px; flex-shrink: 0; }
+    .explore-btn {
+      padding: 5px 10px; border-radius: 4px; border: none; font-family: inherit;
+      font-size: 11px; font-weight: 600; cursor: pointer; transition: background .15s;
+    }
+    .explore-btn-view { background: #2a2a2a; color: #fff; }
+    .explore-btn-view:hover { background: #333; }
+    .explore-btn-request { background: #fff; color: #000; }
+    .explore-btn-request:hover { background: #e0e0e0; }
+    .explore-btn-joined { background: transparent; color: var(--text-muted); border: 1px solid var(--border); cursor: default; }
+
+    /* ---- MAIN (chat + members) ---- */
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    /* Top bar */
+    .topbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .topbar .hash { color: var(--text-muted); font-size: 20px; font-weight: 600; }
+    .topbar .room-name { font-weight: 600; font-size: 15px; color: #fff; }
+    .topbar .room-code-display { font-size: 12px; color: var(--text-muted); margin-left: 4px; }
+    .topbar .room-visibility-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+      font-weight: 600; margin-left: 6px;
+    }
+    .badge-public { background: #2a2a2a; color: #aaa; }
+    .badge-private { background: #1a1a1a; color: #666; }
+    .topbar-right { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+    .topbar-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 4px;
+      position: relative;
+    }
+    .topbar-btn:hover { color: #fff; background: var(--hover); }
+    .topbar-btn.danger:hover { color: var(--red); background: rgba(255,68,68,.1); }
+    .notif-badge {
+      position: absolute; top: -2px; right: -2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--red); color: #fff; font-size: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+    }
+
+    /* No room selected */
+    .no-room {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 8px; color: var(--text-muted);
+    }
+    .no-room .big { font-size: 40px; }
+
+    /* View-only banner */
+    .view-only-banner {
+      display: none; padding: 12px 16px; text-align: center;
+      background: var(--bg-tertiary); border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-only-banner.active { display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .view-only-banner span { font-size: 13px; color: var(--text-muted); }
+    .view-only-banner .request-join-btn {
+      padding: 6px 16px; border-radius: 6px; border: none;
+      background: #fff; color: #000; font-family: inherit;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .view-only-banner .request-join-btn:hover { background: #e0e0e0; }
+    .view-only-banner .request-join-btn.requested {
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border); cursor: default;
+    }
+
+    /* Messages area */
+    .messages {
+      flex: 1; overflow-y: auto; padding: 16px; display: flex;
+      flex-direction: column; gap: 4px;
+    }
+    .messages::-webkit-scrollbar { width: 6px; }
+    .messages::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+
+    .msg {
+      padding: 6px 12px; border-radius: var(--radius);
+      transition: background .15s; max-width: 100%;
+    }
+    .msg:hover { background: var(--hover); }
+    .msg .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+    .msg .username { font-weight: 600; font-size: 14px; color: #fff; }
+    .msg .timestamp { font-size: 11px; color: var(--text-muted); }
+    .msg .text { font-size: 14px; color: var(--text-secondary); line-height: 1.4; word-break: break-word; }
+
+    .msg-error {
+      padding: 8px 14px; background: rgba(255,68,68,.08);
+      border-left: 3px solid var(--red); border-radius: 4px;
+      color: var(--red); font-size: 13px;
+    }
+    .welcome-msg {
+      text-align: center; color: var(--text-muted); font-size: 13px;
+      padding: 20px; margin: auto 0;
+    }
+
+    /* Input bar */
+    .input-bar { padding: 0 16px 16px; flex-shrink: 0; }
+    .input-row {
+      display: flex; align-items: center; gap: 0;
+      background: var(--bg-input); border-radius: var(--radius);
+      padding: 4px 4px 4px 14px; border: 1px solid var(--border);
+    }
+    .input-row input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--text-primary); font-family: inherit; font-size: 14px; padding: 8px 0;
+    }
+    .input-row input::placeholder { color: var(--text-muted); }
+    .send-btn {
+      width: 36px; height: 36px; border: none; border-radius: 6px;
+      background: #fff; color: #000; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, transform .1s; flex-shrink: 0;
+    }
+    .send-btn:hover { background: #e0e0e0; }
+    .send-btn:active { transform: scale(.92); }
+    .send-btn svg { width: 18px; height: 18px; }
+
+    /* ---- ATTACH BUTTON ---- */
+    .attach-btn {
+      width: 36px; height: 36px; border: none; border-radius: 6px;
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: color .15s, background .15s; flex-shrink: 0;
+      font-size: 20px;
+    }
+    .attach-btn:hover { color: #fff; background: var(--hover); }
+
+    /* ---- FILE PREVIEW BAR ---- */
+    .file-preview-bar { display: none; padding: 8px 16px 0; }
+    .file-preview-bar.active { display: block; }
+    .file-preview {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg-input); border-radius: 8px; padding: 8px 12px;
+      max-width: 100%; position: relative; border: 1px solid var(--border);
+    }
+    .file-preview .fp-icon { font-size: 24px; flex-shrink: 0; }
+    .file-preview .fp-name {
+      font-size: 13px; color: #fff; font-weight: 500;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px;
+    }
+    .file-preview .fp-size { font-size: 11px; color: var(--text-muted); }
+    .file-preview .fp-remove {
+      background: #2a2a2a; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 50%;
+      margin-left: 4px;
+    }
+    .file-preview .fp-remove:hover { color: var(--red); }
+    .file-preview .fp-thumb {
+      width: 48px; height: 48px; border-radius: 6px; object-fit: cover; flex-shrink: 0;
+    }
+
+    /* ---- FILE ATTACHMENT IN MESSAGES ---- */
+    .msg-attachment { margin-top: 6px; border-radius: 8px; overflow: hidden; max-width: 400px; }
+    .msg-attachment img {
+      max-width: 100%; max-height: 300px; border-radius: 8px;
+      cursor: pointer; display: block;
+    }
+    .msg-attachment video, .msg-attachment audio {
+      max-width: 100%; border-radius: 8px; display: block;
+    }
+    .msg-attachment video { max-height: 300px; }
+    .msg-file-card {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-input); border-radius: 8px; padding: 10px 14px;
+      border-left: 3px solid #555; cursor: pointer;
+      transition: background .15s; text-decoration: none;
+    }
+    .msg-file-card:hover { background: var(--bg-tertiary); }
+    .msg-file-card .fc-icon { font-size: 28px; flex-shrink: 0; }
+    .msg-file-card .fc-name {
+      font-size: 13px; color: #ccc; font-weight: 600;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .msg-file-card .fc-size { font-size: 11px; color: var(--text-muted); }
+    .msg-file-card .fc-dl { margin-left: auto; font-size: 18px; color: var(--text-muted); flex-shrink: 0; }
+
+    /* ---- MEMBERS PANEL ---- */
+    .members-panel {
+      width: 220px; min-width: 220px; background: var(--bg-secondary);
+      border-left: 1px solid var(--border); display: none;
+      flex-direction: column;
+    }
+    .members-panel.open { display: flex; }
+    .members-panel h4 {
+      padding: 14px 16px; font-size: 12px; text-transform: uppercase;
+      letter-spacing: .5px; color: var(--text-muted); border-bottom: 1px solid var(--border);
+    }
+    .member-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .member-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 8px; border-radius: 6px;
+    }
+    .member-item:hover { background: var(--hover); }
+    .member-item .mname { font-size: 13px; font-weight: 500; flex: 1; color: #fff; }
+    .member-item .host-badge {
+      font-size: 10px; background: #333; color: #aaa;
+      padding: 1px 6px; border-radius: 10px; font-weight: 600;
+    }
+    .kick-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px;
+      display: none;
+    }
+    .member-item:hover .kick-btn.visible { display: block; }
+    .kick-btn:hover { color: var(--red); background: rgba(255,68,68,.1); }
+
+    /* ---- ONLINE DOT ---- */
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .online-dot {
+      position: absolute; bottom: 0; right: 0;
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid var(--bg-secondary);
+    }
+    .online-dot.online { background: #4caf50; }
+    .online-dot.offline { background: #555; }
+
+    /* ---- TYPING INDICATOR ---- */
+    .typing-bar {
+      padding: 2px 16px 4px; font-size: 12px; color: var(--text-muted);
+      min-height: 20px; flex-shrink: 0;
+    }
+    .typing-bar .dots { display: inline-block; }
+
+    /* ---- REPLY BAR ---- */
+    .reply-bar {
+      display: none; padding: 8px 16px;
+      background: var(--bg-tertiary); border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .reply-bar.active { display: flex; align-items: center; gap: 10px; }
+    .reply-bar .reply-preview {
+      flex: 1; min-width: 0; border-left: 3px solid #666;
+      padding-left: 10px;
+    }
+    .reply-bar .reply-author { font-size: 12px; font-weight: 600; color: #fff; }
+    .reply-bar .reply-text {
+      font-size: 12px; color: var(--text-muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .reply-bar .reply-close {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 18px; padding: 2px 6px; border-radius: 4px;
+    }
+    .reply-bar .reply-close:hover { color: #fff; }
+
+    /* ---- MESSAGE ACTIONS (hover toolbar) ---- */
+    .msg { position: relative; }
+    .msg-actions {
+      display: none; position: absolute; top: -8px; right: 8px;
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden; z-index: 5;
+    }
+    .msg:hover .msg-actions { display: flex; }
+    .msg-action-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 14px; padding: 4px 8px;
+      transition: background .1s, color .1s;
+    }
+    .msg-action-btn:hover { background: var(--hover); color: #fff; }
+    .msg-action-btn.pin-active { color: #f5c842; }
+
+    /* ---- REPLY QUOTE INSIDE MESSAGE ---- */
+    .msg-reply-quote {
+      border-left: 3px solid #555; padding: 4px 10px; margin-bottom: 4px;
+      background: rgba(255,255,255,.03); border-radius: 0 4px 4px 0;
+      cursor: pointer;
+    }
+    .msg-reply-quote:hover { background: rgba(255,255,255,.06); }
+    .msg-reply-quote .rq-author { font-size: 11px; font-weight: 600; color: #aaa; }
+    .msg-reply-quote .rq-text { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ---- PINNED PANEL ---- */
+    .pinned-panel {
+      display: none; position: absolute; top: 48px; right: 8px;
+      width: 320px; max-height: 400px; overflow-y: auto;
+      background: var(--bg-tertiary); border: 1px solid var(--border);
+      border-radius: 8px; z-index: 20; box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    }
+    .pinned-panel.open { display: block; }
+    .pinned-panel-header {
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+      font-size: 13px; font-weight: 600; color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .pinned-panel-header button {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 16px;
+    }
+    .pinned-item {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+    }
+    .pinned-item:last-child { border-bottom: none; }
+    .pinned-item .pi-author { font-size: 12px; font-weight: 600; color: #fff; }
+    .pinned-item .pi-text { font-size: 13px; color: var(--text-secondary); margin-top: 2px; word-break: break-word; }
+    .pinned-item .pi-file { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .pinned-item .pi-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; justify-content: space-between; align-items: center; }
+    .pinned-item .unpin-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 11px; padding: 2px 6px; border-radius: 4px;
+    }
+    .pinned-item .unpin-btn:hover { color: var(--red); background: rgba(255,68,68,.1); }
+
+    /* Join requests section in members panel */
+    .join-requests-section {
+      border-top: 1px solid var(--border); padding: 8px;
+    }
+    .join-requests-section h5 {
+      font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+      color: var(--text-muted); margin-bottom: 6px; padding: 0 4px;
+    }
+    .request-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-radius: 6px;
+    }
+    .request-item .rq-name { font-size: 13px; font-weight: 500; flex: 1; color: #fff; }
+    .rq-btn {
+      padding: 3px 8px; border-radius: 4px; border: none;
+      font-family: inherit; font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .rq-approve { background: #fff; color: #000; }
+    .rq-approve:hover { background: #e0e0e0; }
+    .rq-reject { background: transparent; color: var(--red); border: 1px solid #333; }
+    .rq-reject:hover { background: rgba(255,68,68,.1); }
+
+    /* ---- MODAL ---- */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      display: none; align-items: center; justify-content: center; z-index: 100;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg-tertiary); border-radius: 12px;
+      padding: 28px 32px; width: 420px; max-width: 90%;
+      border: 1px solid var(--border);
+    }
+    .modal h3 { font-size: 18px; margin-bottom: 4px; color: #fff; }
+    .modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+    .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+    .modal-btns .btn { flex: 1; }
+    .btn-outline {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+    .btn-outline:hover { background: var(--hover); }
+    .modal-error {
+      color: var(--red); font-size: 13px; margin-top: 8px; min-height: 18px;
+    }
+
+    /* Toggle switch */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0;
+    }
+    .toggle-row .toggle-label { font-size: 13px; color: var(--text-secondary); }
+    .toggle-row .toggle-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .toggle-switch {
+      position: relative; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0;
+    }
+    .toggle-switch input { display: none; }
+    .toggle-slider {
+      position: absolute; inset: 0; background: #333; border-radius: 12px;
+      transition: background .2s;
+    }
+    .toggle-slider::before {
+      content: ""; position: absolute; width: 18px; height: 18px;
+      border-radius: 50%; background: #888; top: 3px; left: 3px;
+      transition: transform .2s, background .2s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: #555; }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); background: #fff; }
+
+    /* ============ ANIMATIONS SUITE ============ */
+
+    /* -- Message slide-in -- */
+    @keyframes msgSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .msg, .msg-error { animation: msgSlideIn .3s cubic-bezier(.22,1,.36,1); }
+
+    /* -- Message hover lift -- */
+    .msg { transition: background .15s, transform .15s, box-shadow .15s; }
+    .msg:hover {
+      background: var(--hover);
+      transform: translateX(3px);
+      box-shadow: -3px 0 0 rgba(255,255,255,.08);
+    }
+
+    /* -- Modal pop-in with bounce -- */
+    @keyframes modalPopIn {
+      0% { opacity: 0; transform: scale(.85); }
+      60% { opacity: 1; transform: scale(1.03); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal-overlay.open { animation: modalFadeIn .2s ease-out; }
+    .modal-overlay.open > div { animation: modalPopIn .35s cubic-bezier(.22,1,.36,1); }
+
+    /* -- Button hover effects -- */
+    .btn { transition: background .15s, transform .1s, opacity .15s, box-shadow .2s; }
+    .btn:hover { box-shadow: 0 0 12px rgba(255,255,255,.08); }
+    .btn-accent:hover { box-shadow: 0 0 20px rgba(255,255,255,.15); }
+    .send-btn { transition: background .15s, transform .15s, box-shadow .2s; }
+    .send-btn:hover { box-shadow: 0 0 16px rgba(255,255,255,.15); transform: scale(1.05); }
+
+    /* -- Online status pulse -- */
+    @keyframes onlinePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,.5); }
+      50% { box-shadow: 0 0 0 4px rgba(76,175,80,.0); }
+    }
+    .online-dot.online { animation: onlinePulse 2s ease-in-out infinite; }
+
+    /* -- Typing indicator bounce dots -- */
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: .3; }
+      40% { transform: translateY(-6px); opacity: 1; }
+    }
+    .typing-bar .dots span {
+      animation: typingBounce 1.4s ease-in-out infinite;
+      display: inline-block; font-size: 18px; line-height: 1;
+    }
+    .typing-bar .dots span:nth-child(2) { animation-delay: .15s; }
+    .typing-bar .dots span:nth-child(3) { animation-delay: .3s; }
+
+    /* -- Room item hover glow -- */
+    .room-item {
+      transition: background .15s, box-shadow .25s, transform .15s;
+    }
+    .room-item:hover {
+      box-shadow: 0 0 12px rgba(255,255,255,.04);
+      transform: translateX(2px);
+    }
+    .explore-room-item { transition: background .15s, transform .15s; }
+    .explore-room-item:hover { transform: translateX(2px); }
+
+    /* -- Login → App screen transition -- */
+    @keyframes screenFadeSlide {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .screen.active { animation: screenFadeSlide .4s cubic-bezier(.22,1,.36,1); }
+
+    /* -- Auth card entrance -- */
+    @keyframes cardFloat {
+      from { opacity: 0; transform: translateY(30px) scale(.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .auth-card { animation: cardFloat .5s cubic-bezier(.22,1,.36,1); }
+
+    /* -- Sidebar user area -- */
+    .sidebar-user { transition: background .2s; }
+    .sidebar-user:hover { background: var(--hover); }
+
+    /* -- Toast/notification slide-in -- */
+    @keyframes toastSlideIn {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes toastSlideOut {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-100%); opacity: 0; }
+    }
+    .toast-notification {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      background: var(--bg-tertiary); color: #fff; padding: 10px 24px;
+      border-radius: 8px; border: 1px solid var(--border);
+      font-size: 13px; font-weight: 500; z-index: 300;
+      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      animation: toastSlideIn .35s cubic-bezier(.22,1,.36,1);
+      pointer-events: none;
+    }
+    .toast-notification.exit { animation: toastSlideOut .3s ease-in forwards; }
+
+    /* -- Smooth scrolling -- */
+    .messages, .room-list, .explore-results, .member-list { scroll-behavior: smooth; }
+
+    /* -- User join system message -- */
+    @keyframes joinFadeIn {
+      from { opacity: 0; transform: scale(.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .msg-system {
+      text-align: center; padding: 6px 12px;
+      font-size: 12px; color: var(--text-muted);
+      animation: joinFadeIn .4s ease-out;
+    }
+    .msg-system .sys-icon { margin-right: 4px; }
+
+    /* -- Input bar focus glow -- */
+    .input-row { transition: border-color .2s, box-shadow .3s; }
+    .input-row:focus-within {
+      border-color: #444;
+      box-shadow: 0 0 12px rgba(255,255,255,.05);
+    }
+
+    /* -- Topbar subtle shimmer -- */
+    .topbar { transition: background .3s; }
+
+    /* -- Members panel items -- */
+    .member-item { transition: background .15s, transform .15s; }
+    .member-item:hover { transform: translateX(2px); }
+
+    /* -- Thunder lightning background -- */
+    #lightning-canvas {
+      position: fixed; inset: 0; z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ---- PASSWORD TOGGLE ---- */
+    .pw-wrapper { position: relative; }
+    .pw-wrapper input { padding-right: 40px; }
+    .pw-toggle {
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 16px; padding: 2px 4px; border-radius: 4px; line-height: 1;
+    }
+    .pw-toggle:hover { color: #fff; }
+
+    /* ---- FORGOT PASSWORD ---- */
+    .forgot-link {
+      background: transparent; border: none; color: var(--text-muted);
+      font-size: 12px; cursor: pointer; font-family: inherit;
+      padding: 0; margin-top: 6px; display: inline-block;
+    }
+    .forgot-link:hover { color: #fff; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .success-text { color: #aaa; font-size: 13px; text-align: center; margin-bottom: 10px; }
+
+    @media (max-width: 700px) {
+      .sidebar { width: 60px; min-width: 60px; }
+      .sidebar-header h3, .room-actions, .room-item .rname, .room-item .rcode,
+      .sidebar-user .uname, .sidebar-user .uemail, .sidebar-tabs { display: none; }
+      .members-panel { width: 180px; min-width: 180px; }
+    }
+
+    /* ---- CO-HOST BADGE ---- */
+    .cohost-badge {
+      font-size: 10px; background: #2a2a3a; color: #8888cc;
+      padding: 1px 6px; border-radius: 10px; font-weight: 600;
+    }
+
+    /* ---- PROFILE PIC (avatar image) ---- */
+    .avatar-img {
+      width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    }
+    .room-icon-img {
+      width: 100%; height: 100%; border-radius: 8px; object-fit: cover;
+    }
+
+    /* ---- EDITED LABEL ---- */
+    .edited-label {
+      font-size: 10px; color: var(--text-muted); margin-left: 4px;
+      font-style: italic;
+    }
+
+    /* ---- MENTION HIGHLIGHT ---- */
+    .mention {
+      background: rgba(88, 101, 242, 0.2); color: #99aaff;
+      padding: 0 2px; border-radius: 3px; font-weight: 600; cursor: pointer;
+    }
+    .mention:hover { background: rgba(88, 101, 242, 0.35); }
+
+    /* ---- MENTION AUTOCOMPLETE ---- */
+    .mention-dropdown {
+      display: none; position: absolute; bottom: 100%; left: 0; right: 0;
+      background: var(--bg-tertiary); border: 1px solid var(--border);
+      border-radius: 8px; max-height: 200px; overflow-y: auto;
+      z-index: 30; box-shadow: 0 -4px 20px rgba(0,0,0,.5);
+      margin-bottom: 4px;
+    }
+    .mention-dropdown.open { display: block; }
+    .mention-option {
+      padding: 8px 12px; cursor: pointer; display: flex;
+      align-items: center; gap: 8px;
+      transition: background .1s;
+    }
+    .mention-option:hover, .mention-option.active {
+      background: var(--hover);
+    }
+    .mention-option .mo-name { font-size: 13px; color: #fff; font-weight: 500; }
+
+    /* ---- EDIT MESSAGE INLINE ---- */
+    .msg-edit-area {
+      display: none; margin-top: 4px;
+    }
+    .msg-edit-area.active { display: flex; gap: 6px; align-items: center; }
+    .msg-edit-area input {
+      flex: 1; padding: 6px 10px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--bg-input);
+      color: #fff; font-family: inherit; font-size: 13px; outline: none;
+    }
+    .msg-edit-area input:focus { border-color: #555; }
+    .msg-edit-btn {
+      padding: 4px 10px; border-radius: 4px; border: none;
+      font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .msg-edit-save { background: #fff; color: #000; }
+    .msg-edit-save:hover { background: #e0e0e0; }
+    .msg-edit-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+    .msg-edit-cancel:hover { background: var(--hover); }
+
+    /* ---- PROFILE PIC UPLOAD AREA ---- */
+    .profile-pic-wrap {
+      position: relative; cursor: pointer;
+    }
+    .profile-pic-wrap:hover .avatar-overlay { opacity: 1; }
+    .avatar-overlay {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: rgba(0,0,0,.5); display: flex; align-items: center;
+      justify-content: center; opacity: 0; transition: opacity .2s;
+      font-size: 12px; color: #fff;
+    }
+
+    /* ---- ROOM PIC BUTTON ---- */
+    .topbar-room-pic {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: var(--bg-input); overflow: hidden; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: var(--text-muted);
+    }
+    .topbar-room-pic img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+
+    /* ---- PIC VIEWER LIGHTBOX ---- */
+    .pic-viewer-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.85);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; cursor: zoom-out;
+    }
+    .pic-viewer-overlay.open { display: flex; }
+    .pic-viewer-overlay img {
+      max-width: 90vw; max-height: 85vh; border-radius: 10px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.6); cursor: default;
+      object-fit: contain;
+    }
+    .pic-viewer-close {
+      position: absolute; top: 18px; right: 24px;
+      background: rgba(255,255,255,.12); border: none; color: #fff;
+      font-size: 28px; cursor: pointer; width: 40px; height: 40px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .pic-viewer-close:hover { background: rgba(255,255,255,.25); }
+    .pic-viewer-name {
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.6); color: #fff; font-size: 14px; font-weight: 600;
+      padding: 6px 18px; border-radius: 20px; pointer-events: none;
+    }
+
+    /* ---- NERD BOT BADGE ---- */
+    .nerd-badge {
+      font-size: 9px; background: rgba(88, 101, 242, 0.3); color: #99aaff;
+      padding: 1px 6px; border-radius: 10px; font-weight: 700;
+      margin-left: 4px; letter-spacing: .5px;
+    }
+
+    /* ---- FORWARD MODAL ---- */
+    .forward-modal {
+      background: var(--bg-tertiary); border-radius: 12px;
+      padding: 20px 24px; width: 380px; max-width: 90%;
+      border: 1px solid var(--border);
+    }
+    .forward-modal h3 { font-size: 16px; margin-bottom: 12px; color: #fff; }
+    .forward-room-list {
+      max-height: 280px; overflow-y: auto; margin-bottom: 12px;
+    }
+    .forward-room-list::-webkit-scrollbar { width: 4px; }
+    .forward-room-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .forward-room-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 6px; cursor: pointer;
+      transition: background .12s;
+    }
+    .forward-room-item:hover { background: var(--hover); }
+    .forward-room-item.selected { background: rgba(88,101,242,0.15); border: 1px solid rgba(88,101,242,0.4); }
+    .forward-room-item .fr-icon {
+      width: 32px; height: 32px; border-radius: 6px;
+      background: var(--bg-input); display: flex; align-items: center;
+      justify-content: center; font-size: 14px; color: var(--text-muted);
+      flex-shrink: 0; overflow: hidden;
+    }
+    .forward-room-item .fr-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .forward-room-item .fr-name { font-size: 13px; font-weight: 600; color: #fff; }
+    .forward-room-item .fr-code { font-size: 11px; color: var(--text-muted); }
+    .forward-room-item .fr-check {
+      margin-left: auto; width: 20px; height: 20px; border-radius: 4px;
+      border: 2px solid #444; background: transparent; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; font-size: 12px; color: transparent;
+    }
+    .forward-room-item.selected .fr-check {
+      background: #99aaff; border-color: #99aaff; color: #000;
+    }
+    .forward-send-btn {
+      width: 100%; padding: 10px; border: none; border-radius: var(--radius);
+      font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+      background: #fff; color: #000; margin-bottom: 8px;
+      transition: background .15s, opacity .15s;
+    }
+    .forward-send-btn:hover { background: #e0e0e0; }
+    .forward-send-btn:disabled { opacity: .4; cursor: default; }
+    .forward-preview {
+      padding: 8px 12px; background: var(--bg-input); border-radius: 6px;
+      border-left: 3px solid #555; margin-bottom: 12px;
+    }
+    .forward-preview .fp-sender { font-size: 11px; font-weight: 600; color: #aaa; }
+    .forward-preview .fp-text {
+      font-size: 12px; color: var(--text-muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Thunder/Lightning background canvas -->
+<canvas id="lightning-canvas"></canvas>
+
+<!-- ============ AUTH SCREEN ============ -->
+<div class="screen active" id="auth-screen">
+  <div class="auth-card">
+    <!-- Login form -->
+    <div id="login-form">
+      <h2>Welcome!</h2>
+      <p class="subtitle">Log in to your study room account</p>
+      <div class="auth-error" id="login-error"></div>
+      <div class="form-group">
+        <label>Username</label>
+        <input id="login-username" placeholder="Your username" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pw-wrapper">
+          <input id="login-password" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" />
+          <button type="button" class="pw-toggle" onclick="togglePw('login-password')" title="Show/hide password">&#128065;</button>
+        </div>
+      </div>
+      <button class="btn btn-accent" onclick="doLogin()">Log In</button>
+      <button type="button" class="forgot-link" onclick="showForgot()">Forgot password?</button>
+      <button class="btn btn-ghost" onclick="showSignup()">Don't have an account? Sign up</button>
+    </div>
+
+    <!-- Signup form -->
+    <div id="signup-form" style="display:none">
+      <h2>Create Account</h2>
+      <p class="subtitle">Join and start studying together</p>
+      <div class="auth-error" id="signup-error"></div>
+      <div class="form-group">
+        <label>Username</label>
+        <input id="signup-username" placeholder="CoolStudier42" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input id="signup-email" type="email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pw-wrapper">
+          <input id="signup-password" type="password" placeholder="Aa1!.... (min 8 chars)" />
+          <button type="button" class="pw-toggle" onclick="togglePw('signup-password')" title="Show/hide password">&#128065;</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.5">Must contain: uppercase, lowercase, number, symbol. Min 8 chars.</div>
+      </div>
+      <button class="btn btn-accent" onclick="doSignup()">Create Account</button>
+      <button class="btn btn-ghost" onclick="showLogin()">Already have an account? Log in</button>
+    </div>
+
+    <!-- Forgot password form -->
+    <div id="forgot-form" style="display:none">
+      <h2>Reset Password</h2>
+      <p class="subtitle">We'll send a reset code to your email</p>
+      <div class="auth-error" id="forgot-error"></div>
+      <div class="success-text" id="forgot-success" style="display:none"></div>
+
+      <!-- Step 1: enter email -->
+      <div id="forgot-step1" class="step active">
+        <div class="form-group">
+          <label>Email</label>
+          <input id="forgot-email" type="email" placeholder="you@example.com" />
+        </div>
+        <button class="btn btn-accent" onclick="doForgotPassword()">Send Reset Code</button>
+      </div>
+
+      <!-- Step 2: enter code + new password -->
+      <div id="forgot-step2" class="step">
+        <div class="form-group">
+          <label>Reset Code</label>
+          <input id="reset-code" placeholder="e.g. A3F9B2" style="text-transform:uppercase; letter-spacing:3px; font-weight:700; text-align:center" />
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <div class="pw-wrapper">
+            <input id="reset-password" type="password" placeholder="Aa1!.... (min 8 chars)" />
+            <button type="button" class="pw-toggle" onclick="togglePw('reset-password')" title="Show/hide password">&#128065;</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <div style="font-size:11px;color:var(--text-muted);line-height:1.5">Must contain: uppercase, lowercase, number, symbol. Min 8 chars.</div>
+        </div>
+        <button class="btn btn-green" onclick="doResetPassword()">Reset Password</button>
+      </div>
+
+      <button class="btn btn-ghost" onclick="showLogin()">Back to Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP SCREEN ============ -->
+<div class="screen" id="app-screen">
+  <div class="app">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>Study Rooms</h3>
+      </div>
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab active" id="tab-rooms" onclick="switchTab('rooms')">My Rooms</button>
+        <button class="sidebar-tab" id="tab-explore" onclick="switchTab('explore')">Explore</button>
+      </div>
+
+      <!-- My Rooms panel -->
+      <div class="rooms-panel active" id="rooms-panel">
+        <div class="room-actions">
+          <button class="btn-create" onclick="openModal('create')">+ Create</button>
+          <button class="btn-join-action" onclick="openModal('join')">Join</button>
+        </div>
+        <div class="room-list" id="room-list">
+          <div class="room-empty">No rooms yet.<br>Create or join one!</div>
+        </div>
+      </div>
+
+      <!-- Explore panel -->
+      <div class="explore-panel" id="explore-panel">
+        <div class="explore-search">
+          <input id="explore-search-input" placeholder="Search public rooms..." autocomplete="off" />
+        </div>
+        <div class="explore-results" id="explore-results">
+          <div class="room-empty">Search for public rooms by name</div>
+        </div>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="profile-pic-wrap" title="Change profile picture">
+          <div class="avatar" id="user-avatar" onclick="viewOwnProfilePic(event)">?</div>
+          <div class="avatar-overlay" onclick="document.getElementById('profile-pic-input').click()">&#128247;</div>
+        </div>
+        <input type="file" id="profile-pic-input" style="display:none" accept="image/*" />
+        <div>
+          <div class="uname" id="user-display-name">&mdash;</div>
+          <div class="uemail" id="user-display-email">&mdash;</div>
+        </div>
+        <button class="logout-btn" onclick="doLogout()" title="Log out">&#9211;</button>
+      </div>
+    </div>
+
+    <!-- Main area -->
+    <div class="main">
+      <div class="topbar" id="topbar">
+        <div class="topbar-room-pic" id="topbar-room-pic" onclick="document.getElementById('room-pic-input').click()" title="Click to change room picture" style="cursor:pointer">
+          <span>#</span>
+        </div>
+        <input type="file" id="room-pic-input" style="display:none" accept="image/*" />
+        <span class="room-name" id="topbar-room-name">&mdash;</span>
+        <span class="room-code-display" id="topbar-room-code"></span>
+        <span class="room-visibility-badge" id="topbar-visibility" style="display:none"></span>
+        <div class="topbar-right">
+          <button class="topbar-btn" id="visibility-toggle-btn" onclick="doToggleVisibility()" title="Toggle Public/Private" style="display:none">&#127760;</button>
+          <button class="topbar-btn" id="pinned-btn" onclick="togglePinnedPanel()" title="Pinned Messages">&#128204;<span class="notif-badge" id="pin-badge" style="display:none">0</span></button>
+          <button class="topbar-btn" id="requests-btn" onclick="toggleMembers()" title="Join Requests" style="display:none">&#128276;<span class="notif-badge" id="request-badge" style="display:none">0</span></button>
+          <button class="topbar-btn" id="members-toggle" onclick="toggleMembers()" title="Members">&#128101;</button>
+          <button class="topbar-btn danger" id="delete-room-btn" onclick="confirmDeleteRoom()" title="Delete Room" style="display:none">&#128465;</button>
+        </div>
+        <!-- Pinned messages dropdown -->
+        <div class="pinned-panel" id="pinned-panel">
+          <div class="pinned-panel-header">
+            <span>&#128204; Pinned Messages</span>
+            <button onclick="togglePinnedPanel()">&times;</button>
+          </div>
+          <div id="pinned-list"><div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">No pinned messages</div></div>
+        </div>
+      </div>
+
+      <!-- No room selected -->
+      <div class="no-room" id="no-room">
+        <div class="big">&#128218;</div>
+        <div>Select a room to start chatting</div>
+      </div>
+
+      <!-- Chat -->
+      <div class="messages" id="messages" style="display:none">
+        <div class="welcome-msg">Welcome! Start the conversation</div>
+      </div>
+
+      <!-- View-only banner (for public rooms not joined) -->
+      <div class="view-only-banner" id="view-only-banner">
+        <span>You are viewing this room in read-only mode</span>
+        <button class="request-join-btn" id="view-request-btn" onclick="doRequestJoinFromView()">Request to Join</button>
+      </div>
+
+      <!-- Typing indicator -->
+      <div class="typing-bar" id="typing-bar"></div>
+
+      <!-- Reply bar -->
+      <div class="reply-bar" id="reply-bar">
+        <div class="reply-preview">
+          <div class="reply-author" id="reply-author"></div>
+          <div class="reply-text" id="reply-text"></div>
+        </div>
+        <button class="reply-close" onclick="cancelReply()">&times;</button>
+      </div>
+
+      <div class="file-preview-bar" id="file-preview-bar">
+        <div class="file-preview" id="file-preview-content"></div>
+      </div>
+      <div class="input-bar" id="input-bar" style="display:none;position:relative">
+        <div class="mention-dropdown" id="mention-dropdown"></div>
+        <div class="input-row">
+          <button class="attach-btn" onclick="document.getElementById('file-input').click()" title="Attach file">&#128206;</button>
+          <input type="file" id="file-input" style="display:none" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z" />
+          <input id="message-input" placeholder="Message this room..." autocomplete="off" />
+          <button class="send-btn" onclick="sendMessage()" title="Send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Members panel -->
+    <div class="members-panel" id="members-panel">
+      <h4>Members &mdash; <span id="member-count">0</span> &nbsp;<span style="font-size:10px;color:#4caf50" id="online-count-label"></span></h4>
+      <div class="member-list" id="member-list"></div>
+      <div class="join-requests-section" id="join-requests-section" style="display:none">
+        <h5>Join Requests</h5>
+        <div id="join-requests-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ MODALS ============ -->
+<!-- Create room modal -->
+<div class="modal-overlay" id="modal-create">
+  <div class="modal">
+    <h3>Create a Room</h3>
+    <p>Give your study room a name. A unique code will be generated.</p>
+    <div class="form-group">
+      <label>Room Name</label>
+      <input id="create-room-name" placeholder="e.g. Math Finals Prep" />
+    </div>
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Public Room</div>
+        <div class="toggle-sub">Anyone can find and view this room</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="create-room-public" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="modal-error" id="create-error"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-accent" onclick="doCreateRoom()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Join room modal -->
+<div class="modal-overlay" id="modal-join">
+  <div class="modal">
+    <h3>Join a Room</h3>
+    <p>Enter the room code shared with you.</p>
+    <div class="form-group">
+      <label>Room Code</label>
+      <input id="join-room-code" placeholder="e.g. study-a3f9" />
+    </div>
+    <div class="modal-error" id="join-error"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-accent" onclick="doJoinRoom()">Join</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal">
+    <h3>Delete Room</h3>
+    <p>This will permanently delete the room and all its messages. This cannot be undone.</p>
+    <div class="modal-error" id="delete-error"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-red" onclick="doDeleteRoom()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pic viewer lightbox -->
+<div class="pic-viewer-overlay" id="pic-viewer" onclick="closePicViewer(event)">
+  <button class="pic-viewer-close" onclick="closePicViewer(event, true)">&times;</button>
+  <img id="pic-viewer-img" src="" alt="" />
+  <div class="pic-viewer-name" id="pic-viewer-name"></div>
+</div>
+
+<!-- Forward message modal -->
+<div class="modal-overlay" id="modal-forward">
+  <div class="forward-modal">
+    <h3>Forward message to...</h3>
+    <div class="forward-preview" id="forward-preview">
+      <div class="fp-sender" id="forward-preview-sender"></div>
+      <div class="fp-text" id="forward-preview-text"></div>
+    </div>
+    <div class="forward-room-list" id="forward-room-list"></div>
+    <button class="forward-send-btn" id="forward-send-btn" onclick="doForwardToSelected()" disabled>Forward</button>
+    <button class="btn btn-outline" style="width:100%" onclick="closeModals()">Cancel</button>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+(() => {
+  /* ========== FILE:// PROTOCOL CHECK ========== */
+  if (window.location.protocol === "file:") {
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#111;color:#fff;font-family:sans-serif;text-align:center;padding:24px;">
+        <div>
+          <h1 style="font-size:28px;margin-bottom:12px;">⚠ Cannot open directly</h1>
+          <p style="color:#aaa;font-size:16px;max-width:480px;">This page must be served by the Node.js server.<br>Start the server and open:</p>
+          <p style="margin-top:16px;"><a href="http://localhost:5000" style="color:#4fc3f7;font-size:20px;font-weight:700;">http://localhost:5000</a></p>
+          <p style="color:#666;font-size:13px;margin-top:24px;">Run <code style="background:#222;padding:2px 8px;border-radius:4px;">npm start</code> in the server folder first.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const API = "/api";
+  const socket = io();
+
+  /* ========== STATE ========== */
+  let currentUser = null;
+  let rooms = [];
+  let activeRoom = null;
+  let previousRoomCode = null;
+  let viewingPublicRoom = null; // { room, messages } for view-only
+  let pendingRequests = {};     // roomId -> [requests]
+  let onlineUsers = [];         // [{ userId, username }] for current room
+  let pinnedMessages = [];      // pinned messages for current room
+  let replyingTo = null;        // { _id, sender, text, fileName } or null
+  let typingUsers = {};         // { username: timeoutId }
+  let typingTimeout = null;     // our own typing debounce
+  let mentionSearch = "";       // current @mention search string
+  let mentionActive = false;    // is mention dropdown open
+  let mentionIndex = 0;         // keyboard highlight index in dropdown
+
+  /* ========== PIC VIEWER ========== */
+  window.openPicViewer = function (src, name) {
+    const overlay = document.getElementById("pic-viewer");
+    const img = document.getElementById("pic-viewer-img");
+    const nameEl = document.getElementById("pic-viewer-name");
+    img.src = src;
+    nameEl.textContent = name || "";
+    nameEl.style.display = name ? "" : "none";
+    overlay.classList.add("open");
+  };
+  window.closePicViewer = function (e, force) {
+    if (force || e.target === document.getElementById("pic-viewer")) {
+      document.getElementById("pic-viewer").classList.remove("open");
+      document.getElementById("pic-viewer-img").src = "";
+    }
+  };
+  // Close on Escape
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && document.getElementById("pic-viewer").classList.contains("open")) {
+      document.getElementById("pic-viewer").classList.remove("open");
+    }
+  });
+
+  /* ========== AUTH ========== */
+  function showLogin() {
+    document.getElementById("login-form").style.display = "";
+    document.getElementById("signup-form").style.display = "none";
+    document.getElementById("forgot-form").style.display = "none";
+    document.getElementById("login-error").textContent = "";
+  }
+  function showSignup() {
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("signup-form").style.display = "";
+    document.getElementById("forgot-form").style.display = "none";
+    document.getElementById("signup-error").textContent = "";
+  }
+  function showForgot() {
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("signup-form").style.display = "none";
+    document.getElementById("forgot-form").style.display = "";
+    document.getElementById("forgot-error").textContent = "";
+    document.getElementById("forgot-success").style.display = "none";
+    document.getElementById("forgot-step1").classList.add("active");
+    document.getElementById("forgot-step2").classList.remove("active");
+  }
+  window.showLogin = showLogin;
+  window.showSignup = showSignup;
+  window.showForgot = showForgot;
+
+  window.togglePw = function (inputId) {
+    const input = document.getElementById(inputId);
+    const btn = input.parentElement.querySelector(".pw-toggle");
+    if (input.type === "password") {
+      input.type = "text";
+      btn.innerHTML = "&#128064;";
+    } else {
+      input.type = "password";
+      btn.innerHTML = "&#128065;";
+    }
+  };
+
+  window.doLogin = async function () {
+    const username = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value;
+    const errEl = document.getElementById("login-error");
+    errEl.textContent = "";
+    if (!username || !password) { errEl.textContent = "Fill in all fields"; return; }
+    try {
+      const res = await fetch(API + "/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.message || "Login failed"; return; }
+      currentUser = { ...data.user, token: data.token };
+      localStorage.setItem("studyroom_user", JSON.stringify(currentUser));
+      enterApp();
+    } catch (e) { errEl.textContent = "Network error"; }
+  };
+
+  window.doSignup = async function () {
+    const username = document.getElementById("signup-username").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const password = document.getElementById("signup-password").value;
+    const errEl = document.getElementById("signup-error");
+    errEl.textContent = "";
+    if (!username || !email || !password) { errEl.textContent = "Fill in all fields"; return; }
+    const strongPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]).{8,}$/;
+    if (!strongPwd.test(password)) {
+      errEl.textContent = "Password needs 8+ chars with uppercase, lowercase, number & symbol";
+      return;
+    }
+    try {
+      const res = await fetch(API + "/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.message || "Signup failed"; return; }
+      const loginRes = await fetch(API + "/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const loginData = await loginRes.json();
+      if (!loginRes.ok) { errEl.textContent = "Account created. Please log in."; showLogin(); return; }
+      currentUser = { ...loginData.user, token: loginData.token };
+      localStorage.setItem("studyroom_user", JSON.stringify(currentUser));
+      enterApp();
+    } catch (e) { errEl.textContent = "Network error"; }
+  };
+
+  window.doLogout = function () {
+    localStorage.removeItem("studyroom_user");
+    currentUser = null;
+    activeRoom = null;
+    previousRoomCode = null;
+    viewingPublicRoom = null;
+    rooms = [];
+    pendingRequests = {};
+    document.getElementById("login-username").value = "";
+    document.getElementById("login-password").value = "";
+    document.getElementById("signup-username").value = "";
+    document.getElementById("signup-email").value = "";
+    document.getElementById("signup-password").value = "";
+    document.getElementById("forgot-email").value = "";
+    document.getElementById("reset-code").value = "";
+    document.getElementById("reset-password").value = "";
+    document.getElementById("login-error").textContent = "";
+    document.getElementById("signup-error").textContent = "";
+    document.getElementById("forgot-error").textContent = "";
+    document.getElementById("forgot-success").style.display = "none";
+    ["login-password", "signup-password", "reset-password"].forEach(id => {
+      const inp = document.getElementById(id);
+      if (inp) inp.type = "password";
+    });
+    showLogin();
+    document.getElementById("app-screen").classList.remove("active");
+    document.getElementById("auth-screen").classList.add("active");
+  };
+
+  // Enter key on auth inputs
+  document.getElementById("login-username").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("login-password").focus(); });
+  document.getElementById("login-password").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+  document.getElementById("signup-password").addEventListener("keydown", e => { if (e.key === "Enter") doSignup(); });
+  document.getElementById("forgot-email").addEventListener("keydown", e => { if (e.key === "Enter") doForgotPassword(); });
+  document.getElementById("reset-code").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("reset-password").focus(); });
+  document.getElementById("reset-password").addEventListener("keydown", e => { if (e.key === "Enter") doResetPassword(); });
+
+  /* ========== FORGOT / RESET PASSWORD ========== */
+  window.doForgotPassword = async function () {
+    const email = document.getElementById("forgot-email").value.trim();
+    const errEl = document.getElementById("forgot-error");
+    const successEl = document.getElementById("forgot-success");
+    errEl.textContent = "";
+    successEl.style.display = "none";
+    if (!email) { errEl.textContent = "Enter your email address"; return; }
+    try {
+      const res = await fetch(API + "/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.message || "Failed"; return; }
+      successEl.textContent = "Reset code sent! Check your email.";
+      successEl.style.display = "";
+      document.getElementById("forgot-step1").classList.remove("active");
+      document.getElementById("forgot-step2").classList.add("active");
+    } catch (e) { errEl.textContent = "Network error"; }
+  };
+
+  window.doResetPassword = async function () {
+    const email = document.getElementById("forgot-email").value.trim();
+    const resetCode = document.getElementById("reset-code").value.trim().toUpperCase();
+    const newPassword = document.getElementById("reset-password").value;
+    const errEl = document.getElementById("forgot-error");
+    const successEl = document.getElementById("forgot-success");
+    errEl.textContent = "";
+    if (!resetCode || !newPassword) { errEl.textContent = "Fill in all fields"; return; }
+    const strongPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]).{8,}$/;
+    if (!strongPwd.test(newPassword)) {
+      errEl.textContent = "Password needs 8+ chars with uppercase, lowercase, number & symbol";
+      return;
+    }
+    try {
+      const res = await fetch(API + "/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, resetCode, newPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.message || "Failed"; return; }
+      successEl.textContent = "Password reset successful! Redirecting to login...";
+      successEl.style.display = "";
+      errEl.textContent = "";
+      setTimeout(() => showLogin(), 2000);
+    } catch (e) { errEl.textContent = "Network error"; }
+  };
+
+  /* ========== SIDEBAR TABS ========== */
+  window.switchTab = function (tab) {
+    document.getElementById("tab-rooms").classList.toggle("active", tab === "rooms");
+    document.getElementById("tab-explore").classList.toggle("active", tab === "explore");
+    document.getElementById("rooms-panel").classList.toggle("active", tab === "rooms");
+    document.getElementById("explore-panel").classList.toggle("active", tab === "explore");
+    if (tab === "explore") {
+      document.getElementById("explore-search-input").focus();
+    }
+  };
+
+  /* ========== EXPLORE / SEARCH ========== */
+  let searchTimeout = null;
+  document.getElementById("explore-search-input").addEventListener("input", function () {
+    clearTimeout(searchTimeout);
+    const q = this.value.trim();
+    if (!q) {
+      document.getElementById("explore-results").innerHTML = '<div class="room-empty">Search for public rooms by name</div>';
+      return;
+    }
+    searchTimeout = setTimeout(() => doSearchRooms(q), 300);
+  });
+  document.getElementById("explore-search-input").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      clearTimeout(searchTimeout);
+      const q = this.value.trim();
+      if (q) doSearchRooms(q);
+    }
+  });
+
+  async function doSearchRooms(query) {
+    try {
+      const res = await fetch(API + "/rooms/search?q=" + encodeURIComponent(query));
+      const results = await res.json();
+      const container = document.getElementById("explore-results");
+      if (results.length === 0) {
+        container.innerHTML = '<div class="room-empty">No public rooms found</div>';
+        return;
+      }
+      container.innerHTML = results.map(r => {
+        const isMember = r.participants.some(p => (p._id || p) === currentUser._id);
+        const hostName = r.host ? r.host.username : "Unknown";
+        return `
+          <div class="explore-room-item">
+            <div class="room-icon">#</div>
+            <div class="explore-room-meta">
+              <div class="ername">${esc(r.roomName)}</div>
+              <div class="ermeta">${r.participants.length} members &middot; by ${esc(hostName)}</div>
+            </div>
+            <div class="explore-btns">
+              <button class="explore-btn explore-btn-view" onclick="viewPublicRoom('${r._id}')">View</button>
+              ${isMember
+                ? '<button class="explore-btn explore-btn-joined" disabled>Joined</button>'
+                : `<button class="explore-btn explore-btn-request" onclick="requestJoinRoom('${r._id}', this)">Request</button>`}
+            </div>
+          </div>
+        `;
+      }).join("");
+    } catch (e) { console.error("Search error", e); }
+  }
+
+  /* ========== VIEW PUBLIC ROOM (read-only) ========== */
+  window.viewPublicRoom = async function (roomId) {
+    try {
+      const res = await fetch(API + "/rooms/public/" + roomId);
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Cannot view this room"); return; }
+
+      // Exit any active room
+      if (activeRoom && previousRoomCode) {
+        socket.emit("leaveRoom", previousRoomCode);
+      }
+      activeRoom = null;
+      viewingPublicRoom = data;
+
+      // Update UI
+      renderRoomList();
+      document.getElementById("topbar-room-name").textContent = data.room.roomName;
+      document.getElementById("topbar-room-code").textContent = "";
+      updateVisibilityBadge(true);
+      document.getElementById("no-room").style.display = "none";
+      document.getElementById("messages").style.display = "flex";
+      document.getElementById("input-bar").style.display = "none";
+      document.getElementById("delete-room-btn").style.display = "none";
+      document.getElementById("visibility-toggle-btn").style.display = "none";
+      document.getElementById("requests-btn").style.display = "none";
+
+      // Show view-only banner
+      const banner = document.getElementById("view-only-banner");
+      const reqBtn = document.getElementById("view-request-btn");
+      const isMember = data.room.participants.some(p => (p._id || p) === currentUser._id);
+      if (isMember) {
+        banner.classList.remove("active");
+        // Just select the room normally
+        await loadRooms();
+        const myRoom = rooms.find(r => r._id === roomId);
+        if (myRoom) selectRoom(myRoom._id);
+        return;
+      }
+      reqBtn.textContent = "Request to Join";
+      reqBtn.classList.remove("requested");
+      reqBtn.disabled = false;
+      banner.classList.add("active");
+
+      // Render messages read-only
+      const el = document.getElementById("messages");
+      el.innerHTML = "";
+      if (data.messages.length === 0) {
+        el.innerHTML = '<div class="welcome-msg">No messages yet</div>';
+      } else {
+        data.messages.forEach(msg => renderMessage(msg));
+      }
+
+      // Show members (read-only)
+      renderViewOnlyMembers(data.room);
+    } catch (e) { console.error("View public room error", e); }
+  };
+
+  function renderViewOnlyMembers(room) {
+    const participants = room.participants || [];
+    const hostId = room.host ? (room.host._id || room.host) : null;
+    document.getElementById("member-count").textContent = participants.length;
+    const list = document.getElementById("member-list");
+    list.innerHTML = participants.map(p => {
+      const pid = p._id || p;
+      const pname = p.username || "Unknown";
+      const isHost = pid === hostId;
+      return `
+        <div class="member-item">
+          <div class="avatar" style="width:28px;height:28px;font-size:12px">${pname.charAt(0).toUpperCase()}</div>
+          <span class="mname">${esc(pname)}</span>
+          ${isHost ? '<span class="host-badge">HOST</span>' : ''}
+        </div>
+      `;
+    }).join("");
+    document.getElementById("join-requests-section").style.display = "none";
+  }
+
+  window.doRequestJoinFromView = async function () {
+    if (!viewingPublicRoom) return;
+    const roomId = viewingPublicRoom.room._id;
+    const btn = document.getElementById("view-request-btn");
+    try {
+      const res = await fetch(API + "/rooms/" + roomId + "/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Failed"); return; }
+      btn.textContent = "Request Sent";
+      btn.classList.add("requested");
+      btn.disabled = true;
+    } catch (e) { alert("Network error"); }
+  };
+
+  window.requestJoinRoom = async function (roomId, btnEl) {
+    try {
+      const res = await fetch(API + "/rooms/" + roomId + "/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Failed"); return; }
+      btnEl.textContent = "Sent";
+      btnEl.classList.remove("explore-btn-request");
+      btnEl.classList.add("explore-btn-joined");
+      btnEl.disabled = true;
+    } catch (e) { alert("Network error"); }
+  };
+
+  /* ========== ENTER APP ========== */
+  async function enterApp() {
+    document.getElementById("auth-screen").classList.remove("active");
+    document.getElementById("app-screen").classList.add("active");
+    // Trigger entrance animation
+    document.querySelector(".app").style.animation = "cardFloat .5s cubic-bezier(.22,1,.36,1)";
+    document.getElementById("user-display-name").textContent = currentUser.username;
+    document.getElementById("user-display-email").textContent = currentUser.email;
+    updateUserAvatar();
+    socket.emit("registerUser", currentUser._id);
+    await loadRooms();
+  }
+
+  function updateUserAvatar() {
+    const avatarEl = document.getElementById("user-avatar");
+    if (currentUser.profilePic) {
+      avatarEl.innerHTML = `<img class="avatar-img" src="${currentUser.profilePic}" alt="" />`;
+    } else {
+      avatarEl.textContent = currentUser.username.charAt(0).toUpperCase();
+    }
+  }
+
+  window.viewOwnProfilePic = function (e) {
+    if (currentUser && currentUser.profilePic) {
+      e.stopPropagation();
+      openPicViewer(currentUser.profilePic, currentUser.username);
+    }
+  };
+
+  // Profile pic upload
+  document.getElementById("profile-pic-input").addEventListener("change", async function () {
+    const file = this.files[0];
+    if (!file || !currentUser) return;
+    this.value = "";
+    const formData = new FormData();
+    formData.append("profilePic", file);
+    formData.append("userId", currentUser._id);
+    try {
+      const res = await fetch("/api/profile-pic", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Upload failed"); return; }
+      currentUser.profilePic = data.profilePic;
+      localStorage.setItem("studyroom_user", JSON.stringify(currentUser));
+      updateUserAvatar();
+    } catch (e) { alert("Upload failed"); }
+  });
+
+  // Room pic upload
+  document.getElementById("room-pic-input").addEventListener("change", async function () {
+    const file = this.files[0];
+    if (!file || !activeRoom) return;
+    this.value = "";
+    const formData = new FormData();
+    formData.append("roomPic", file);
+    formData.append("roomId", activeRoom._id);
+    formData.append("userId", currentUser._id);
+    try {
+      const res = await fetch("/api/room-pic", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Upload failed"); return; }
+      activeRoom.roomPic = data.roomPic;
+      const room = rooms.find(r => r._id === activeRoom._id);
+      if (room) room.roomPic = data.roomPic;
+      updateTopbarRoomPic();
+      renderRoomList();
+    } catch (e) { alert("Upload failed"); }
+  });
+
+  /* ========== ROOMS ========== */
+  async function loadRooms() {
+    try {
+      const res = await fetch(API + "/rooms/my/" + currentUser._id);
+      rooms = await res.json();
+      renderRoomList();
+    } catch (e) { console.error("Failed to load rooms", e); }
+  }
+
+  function renderRoomList() {
+    const list = document.getElementById("room-list");
+    if (rooms.length === 0) {
+      list.innerHTML = '<div class="room-empty">No rooms yet.<br>Create or join one!</div>';
+      return;
+    }
+    list.innerHTML = rooms.map(r => {
+      const vis = r.isPublic ? "&#127760;" : "&#128274;";
+      const roomPicHtml = r.roomPic
+        ? `<div class="room-icon"><img class="room-icon-img" src="${r.roomPic}" alt="" onclick="event.stopPropagation();openPicViewer('${r.roomPic}','${esc(r.roomName)}')" style="cursor:pointer" /></div>`
+        : `<div class="room-icon">${vis}</div>`;
+      return `
+        <div class="room-item ${activeRoom && activeRoom._id === r._id ? 'active' : ''}"
+             onclick="selectRoom('${r._id}')" title="${esc(r.roomCode)}">
+          ${roomPicHtml}
+          <div>
+            <div class="rname">${esc(r.roomName)}</div>
+            <div class="rcode">${esc(r.roomCode)}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.selectRoom = async function (roomId) {
+    const room = rooms.find(r => r._id === roomId);
+    if (!room) return;
+
+    viewingPublicRoom = null;
+    document.getElementById("view-only-banner").classList.remove("active");
+
+    if (previousRoomCode) {
+      socket.emit("leaveRoom", previousRoomCode);
+    }
+    activeRoom = room;
+    previousRoomCode = room.roomCode;
+
+    renderRoomList();
+    document.getElementById("topbar-room-name").textContent = room.roomName;
+    document.getElementById("topbar-room-code").textContent = room.roomCode;
+    updateVisibilityBadge(room.isPublic);
+    updateTopbarRoomPic();
+    document.getElementById("no-room").style.display = "none";
+    document.getElementById("messages").style.display = "flex";
+    document.getElementById("input-bar").style.display = "";
+    document.getElementById("messages").innerHTML = '<div class="welcome-msg">Loading messages...</div>';
+
+    const hostId = room.host ? (room.host._id || room.host) : null;
+    const isHost = hostId === currentUser._id;
+    const isCoHost = (room.coHosts || []).some(c => (c._id || c) === currentUser._id);
+    document.getElementById("delete-room-btn").style.display = isHost ? "" : "none";
+    document.getElementById("visibility-toggle-btn").style.display = isHost ? "" : "none";
+    document.getElementById("requests-btn").style.display = (isHost || isCoHost) ? "" : "none";
+
+    // Load join requests for host/co-host
+    if (isHost || isCoHost) {
+      await loadJoinRequests(room._id);
+    }
+
+    renderMembers();
+    socket.emit("joinRoom", room.roomCode);
+    document.getElementById("message-input").focus();
+  };
+
+  function updateVisibilityBadge(isPublic) {
+    const badge = document.getElementById("topbar-visibility");
+    badge.style.display = "";
+    if (isPublic) {
+      badge.textContent = "PUBLIC";
+      badge.className = "room-visibility-badge badge-public";
+    } else {
+      badge.textContent = "PRIVATE";
+      badge.className = "room-visibility-badge badge-private";
+    }
+  }
+
+  function updateTopbarRoomPic() {
+    const el = document.getElementById("topbar-room-pic");
+    if (activeRoom && activeRoom.roomPic) {
+      el.innerHTML = `<img src="${activeRoom.roomPic}" alt="" onclick="openPicViewer('${activeRoom.roomPic}', '${esc(activeRoom.roomName)}')" style="cursor:pointer" />`;
+      el.onclick = null;
+    } else {
+      el.innerHTML = `<span>#</span>`;
+      el.onclick = function () { document.getElementById('room-pic-input').click(); };
+    }
+  }
+
+  /* ========== TOGGLE VISIBILITY ========== */
+  window.doToggleVisibility = async function () {
+    if (!activeRoom) return;
+    try {
+      const res = await fetch(API + "/rooms/" + activeRoom._id + "/visibility", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Failed"); return; }
+      activeRoom.isPublic = data.isPublic;
+      const r = rooms.find(rm => rm._id === activeRoom._id);
+      if (r) r.isPublic = data.isPublic;
+      updateVisibilityBadge(data.isPublic);
+      renderRoomList();
+    } catch (e) { alert("Network error"); }
+  };
+
+  /* ========== JOIN REQUESTS ========== */
+  async function loadJoinRequests(roomId) {
+    try {
+      const res = await fetch(API + "/rooms/" + roomId + "/requests?userId=" + currentUser._id);
+      const reqs = await res.json();
+      pendingRequests[roomId] = reqs;
+      renderJoinRequests();
+      updateRequestBadge();
+    } catch (e) { console.error("Failed to load requests", e); }
+  }
+
+  function renderJoinRequests() {
+    if (!activeRoom) return;
+    const reqs = pendingRequests[activeRoom._id] || [];
+    const section = document.getElementById("join-requests-section");
+    const list = document.getElementById("join-requests-list");
+
+    const hostId = activeRoom.host ? (activeRoom.host._id || activeRoom.host) : null;
+    const isHost = hostId === currentUser._id;
+    const isCoHost = (activeRoom.coHosts || []).some(c => (c._id || c) === currentUser._id);
+    if ((!isHost && !isCoHost) || reqs.length === 0) {
+      section.style.display = "none";
+      return;
+    }
+
+    section.style.display = "";
+    list.innerHTML = reqs.map(r => {
+      const u = r.user || {};
+      return `
+        <div class="request-item">
+          <div class="avatar" style="width:24px;height:24px;font-size:10px">${(u.username || "?").charAt(0).toUpperCase()}</div>
+          <span class="rq-name">${esc(u.username || "Unknown")}</span>
+          <button class="rq-btn rq-approve" onclick="approveRequest('${activeRoom._id}', '${u._id}')">&#10003;</button>
+          <button class="rq-btn rq-reject" onclick="rejectRequest('${activeRoom._id}', '${u._id}')">&#10005;</button>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function updateRequestBadge() {
+    if (!activeRoom) return;
+    const reqs = pendingRequests[activeRoom._id] || [];
+    const badge = document.getElementById("request-badge");
+    if (reqs.length > 0) {
+      badge.textContent = reqs.length;
+      badge.style.display = "";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+
+  window.approveRequest = async function (roomId, requestUserId) {
+    try {
+      const res = await fetch(API + "/rooms/" + roomId + "/approve/" + requestUserId, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Failed"); return; }
+      activeRoom.participants = data.participants;
+      const r = rooms.find(rm => rm._id === roomId);
+      if (r) r.participants = data.participants;
+      await loadJoinRequests(roomId);
+      renderMembers();
+    } catch (e) { alert("Network error"); }
+  };
+
+  window.rejectRequest = async function (roomId, requestUserId) {
+    try {
+      const res = await fetch(API + "/rooms/" + roomId + "/reject/" + requestUserId, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Failed"); return; }
+      await loadJoinRequests(roomId);
+    } catch (e) { alert("Network error"); }
+  };
+
+  /* ========== CREATE / JOIN ROOM ========== */
+  window.openModal = function (type) {
+    closeModals();
+    document.getElementById("modal-" + type).classList.add("open");
+  };
+  window.closeModals = function () {
+    document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("open"));
+    document.querySelectorAll(".modal-error").forEach(e => e.textContent = "");
+  };
+
+  window.doCreateRoom = async function () {
+    const nameInput = document.getElementById("create-room-name");
+    const isPublic = document.getElementById("create-room-public").checked;
+    const errEl = document.getElementById("create-error");
+    const name = nameInput.value.trim();
+    if (!name) { errEl.textContent = "Enter a room name"; return; }
+    try {
+      const res = await fetch(API + "/rooms/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id, roomName: name, isPublic })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.message || "Failed"; return; }
+      nameInput.value = "";
+      document.getElementById("create-room-public").checked = false;
+      closeModals();
+      await loadRooms();
+      selectRoom(data.room._id);
+    } catch (e) { errEl.textContent = "Network error"; }
+  };
+
+  window.doJoinRoom = async function () {
+    const codeInput = document.getElementById("join-room-code");
+    const errEl = document.getElementById("join-error");
+    const code = codeInput.value.trim();
+    if (!code) { errEl.textContent = "Enter a room code"; return; }
+    try {
+      const res = await fetch(API + "/rooms/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomCode: code, userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.message || "Failed"; return; }
+      codeInput.value = "";
+      closeModals();
+      await loadRooms();
+      selectRoom(data.room._id);
+    } catch (e) { errEl.textContent = "Network error"; }
+  };
+
+  document.getElementById("create-room-name").addEventListener("keydown", e => { if (e.key === "Enter") doCreateRoom(); });
+  document.getElementById("join-room-code").addEventListener("keydown", e => { if (e.key === "Enter") doJoinRoom(); });
+
+  /* ========== DELETE ROOM ========== */
+  window.confirmDeleteRoom = function () {
+    if (!activeRoom) return;
+    openModal("delete");
+  };
+
+  window.doDeleteRoom = async function () {
+    const errEl = document.getElementById("delete-error");
+    try {
+      const res = await fetch(API + "/rooms/" + activeRoom._id, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.message || "Failed"; return; }
+      closeModals();
+      resetChatArea();
+      await loadRooms();
+    } catch (e) { errEl.textContent = "Network error"; }
+  };
+
+  function resetChatArea() {
+    activeRoom = null;
+    previousRoomCode = null;
+    viewingPublicRoom = null;
+    replyingTo = null;
+    typingUsers = {};
+    onlineUsers = [];
+    pinnedMessages = [];
+    mentionActive = false;
+    mentionSearch = "";
+    document.getElementById("mention-dropdown").classList.remove("open");
+    document.getElementById("no-room").style.display = "";
+    document.getElementById("messages").style.display = "none";
+    document.getElementById("input-bar").style.display = "none";
+    document.getElementById("view-only-banner").classList.remove("active");
+    document.getElementById("reply-bar").classList.remove("active");
+    document.getElementById("typing-bar").innerHTML = "";
+    document.getElementById("pinned-panel").classList.remove("open");
+    document.getElementById("pin-badge").style.display = "none";
+    document.getElementById("topbar-room-name").textContent = "\u2014";
+    document.getElementById("topbar-room-code").textContent = "";
+    document.getElementById("topbar-visibility").style.display = "none";
+    document.getElementById("delete-room-btn").style.display = "none";
+    document.getElementById("visibility-toggle-btn").style.display = "none";
+    document.getElementById("requests-btn").style.display = "none";
+    document.getElementById("members-panel").classList.remove("open");
+  }
+
+  /* ========== MEMBERS PANEL ========== */
+  window.toggleMembers = function () {
+    document.getElementById("members-panel").classList.toggle("open");
+  };
+
+  function renderMembers() {
+    if (!activeRoom) return;
+    const list = document.getElementById("member-list");
+    const participants = activeRoom.participants || [];
+    const hostId = activeRoom.host ? (activeRoom.host._id || activeRoom.host) : null;
+    const isHost = hostId === currentUser._id;
+    const coHostIds = (activeRoom.coHosts || []).map(c => c._id || c);
+    const isCoHost = coHostIds.includes(currentUser._id);
+
+    document.getElementById("member-count").textContent = participants.length;
+
+    // Online count
+    const onlineIds = new Set(onlineUsers.map(u => u.userId));
+    const onlineCount = participants.filter(p => onlineIds.has(p._id || p)).length;
+    document.getElementById("online-count-label").textContent = onlineCount > 0 ? `(${onlineCount} online)` : '';
+
+    list.innerHTML = participants.map(p => {
+      const pid = p._id || p;
+      const pname = p.username || "Unknown";
+      const ppic = p.profilePic || null;
+      const isThisHost = pid === hostId;
+      const isThisCoHost = coHostIds.includes(pid);
+      const showKick = (isHost || (isCoHost && !isThisHost && !isThisCoHost)) && pid !== currentUser._id && !isThisHost;
+      const isOnline = onlineIds.has(pid);
+
+      // Co-host management buttons (host only)
+      let cohostBtn = "";
+      if (isHost && !isThisHost) {
+        if (isThisCoHost) {
+          cohostBtn = `<button class="kick-btn visible" onclick="doRemoveCoHost('${pid}')" title="Remove Co-Host" style="color:#8888cc">&#9878;</button>`;
+        } else {
+          cohostBtn = `<button class="kick-btn visible" onclick="doAddCoHost('${pid}')" title="Make Co-Host" style="color:#888">&#9733;</button>`;
+        }
+      }
+
+      const avatarHtml = ppic
+        ? `<img class="avatar-img" src="${ppic}" alt="" />`
+        : pname.charAt(0).toUpperCase();
+
+      const avatarClick = ppic ? `onclick="openPicViewer('${ppic}','${esc(pname)}')" style="cursor:pointer"` : '';
+
+      return `
+        <div class="member-item">
+          <div class="avatar-wrap">
+            <div class="avatar" style="width:28px;height:28px;font-size:12px" ${avatarClick}>${avatarHtml}</div>
+            <div class="online-dot ${isOnline ? 'online' : 'offline'}"></div>
+          </div>
+          <span class="mname">${esc(pname)}</span>
+          ${isThisHost ? '<span class="host-badge">HOST</span>' : ''}
+          ${isThisCoHost && !isThisHost ? '<span class="cohost-badge">CO-HOST</span>' : ''}
+          ${cohostBtn}
+          ${showKick ? `<button class="kick-btn visible" onclick="doKickMember('${pid}')" title="Remove">&#10005;</button>` : ''}
+        </div>
+      `;
+    }).join("");
+
+    renderJoinRequests();
+  }
+
+  window.doAddCoHost = async function (memberId) {
+    if (!activeRoom) return;
+    try {
+      const res = await fetch(API + "/rooms/" + activeRoom._id + "/cohost/" + memberId, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Failed"); return; }
+      activeRoom.coHosts = data.coHosts;
+      renderMembers();
+    } catch (e) { alert("Network error"); }
+  };
+
+  window.doRemoveCoHost = async function (memberId) {
+    if (!activeRoom) return;
+    try {
+      const res = await fetch(API + "/rooms/" + activeRoom._id + "/cohost/" + memberId, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Failed"); return; }
+      activeRoom.coHosts = data.coHosts;
+      renderMembers();
+    } catch (e) { alert("Network error"); }
+  };
+
+  window.doKickMember = async function (memberId) {
+    if (!activeRoom) return;
+    try {
+      const res = await fetch(API + "/rooms/" + activeRoom._id + "/member/" + memberId, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.message || "Failed to remove"); return; }
+      activeRoom.participants = data.participants;
+      renderMembers();
+    } catch (e) { alert("Network error"); }
+  };
+
+  /* ========== CHAT MESSAGES ========== */
+  let pendingFile = null;
+
+  document.getElementById("file-input").addEventListener("change", function () {
+    const file = this.files[0];
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) { alert("File too large. Max 25 MB."); this.value = ""; return; }
+    pendingFile = file;
+    showFilePreview(file);
+    this.value = "";
+  });
+
+  function showFilePreview(file) {
+    const bar = document.getElementById("file-preview-bar");
+    const content = document.getElementById("file-preview-content");
+    const icon = getFileIcon(file.type);
+    const size = formatFileSize(file.size);
+    let thumbHtml = "";
+    if (file.type.startsWith("image/")) {
+      const url = URL.createObjectURL(file);
+      thumbHtml = `<img class="fp-thumb" src="${url}" />`;
+    }
+    content.innerHTML = `
+      ${thumbHtml || '<span class="fp-icon">' + icon + '</span>'}
+      <div>
+        <div class="fp-name">${esc(file.name)}</div>
+        <div class="fp-size">${size}</div>
+      </div>
+      <button class="fp-remove" onclick="clearPendingFile()" title="Remove">&#10005;</button>
+    `;
+    bar.classList.add("active");
+  }
+
+  window.clearPendingFile = function () {
+    pendingFile = null;
+    document.getElementById("file-preview-bar").classList.remove("active");
+    document.getElementById("file-preview-content").innerHTML = "";
+  };
+
+  window.sendMessage = async function () {
+    const input = document.getElementById("message-input");
+    const text = input.value.trim();
+    if ((!text && !pendingFile) || !activeRoom) return;
+
+    // Stop typing indicator
+    socket.emit("stopTyping", { roomCode: activeRoom.roomCode, username: currentUser.username });
+    clearTimeout(typingTimeout);
+
+    if (pendingFile) {
+      const formData = new FormData();
+      formData.append("file", pendingFile);
+      formData.append("roomCode", activeRoom.roomCode);
+      formData.append("sender", currentUser._id);
+      if (text) formData.append("text", text);
+      if (replyingTo) formData.append("replyTo", replyingTo._id);
+      input.value = "";
+      clearPendingFile();
+      cancelReply();
+      try {
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        if (!res.ok) {
+          const data = await res.json();
+          renderError(data.message || "Upload failed");
+        }
+      } catch (e) { renderError("Failed to upload file"); }
+    } else {
+      // Extract @mentions from text
+      const mentionIds = [];
+      if (activeRoom) {
+        const participants = activeRoom.participants || [];
+        participants.forEach(p => {
+          const pname = p.username || "";
+          const pid = p._id || p;
+          if (pname && text.toLowerCase().includes("@" + pname.toLowerCase())) {
+            mentionIds.push(pid);
+          }
+        });
+      }
+      socket.emit("sendMessage", {
+        roomCode: activeRoom.roomCode,
+        message: text,
+        sender: currentUser._id,
+        replyTo: replyingTo ? replyingTo._id : null,
+        mentions: mentionIds
+      });
+      input.value = "";
+      cancelReply();
+    }
+    input.focus();
+  };
+
+  document.getElementById("message-input").addEventListener("keydown", e => {
+    if (mentionActive) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const options = mentionDropdown.querySelectorAll(".mention-option");
+        mentionIndex = Math.min(mentionIndex + 1, options.length - 1);
+        updateMentionDropdown();
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        mentionIndex = Math.max(mentionIndex - 1, 0);
+        updateMentionDropdown();
+        return;
+      }
+      if (e.key === "Enter" || e.key === "Tab") {
+        e.preventDefault();
+        const activeOption = mentionDropdown.querySelector(".mention-option.active .mo-name");
+        if (activeOption) completeMention(activeOption.textContent);
+        return;
+      }
+      if (e.key === "Escape") {
+        mentionDropdown.classList.remove("open");
+        mentionActive = false;
+        return;
+      }
+    }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  // Drag & drop
+  const messagesEl = document.getElementById("messages");
+  ["dragenter", "dragover"].forEach(evt => {
+    messagesEl.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
+  });
+  messagesEl.addEventListener("drop", e => {
+    e.preventDefault(); e.stopPropagation();
+    const file = e.dataTransfer.files[0];
+    if (file && activeRoom) {
+      if (file.size > 25 * 1024 * 1024) { alert("File too large. Max 25 MB."); return; }
+      pendingFile = file;
+      showFilePreview(file);
+    }
+  });
+
+  // Paste images
+  document.getElementById("message-input").addEventListener("paste", e => {
+    const items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith("image/")) {
+        const file = items[i].getAsFile();
+        if (file && activeRoom) { pendingFile = file; showFilePreview(file); }
+        break;
+      }
+    }
+  });
+
+  /* ---- Render helpers ---- */
+  function formatTime(iso) {
+    const d = new Date(iso);
+    const now = new Date();
+    const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return d.toDateString() === now.toDateString() ? "Today at " + time :
+      d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + time;
+  }
+  function esc(s) {
+    const d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+  function getFileIcon(mime) {
+    if (!mime) return "\uD83D\uDCC4";
+    if (mime.startsWith("image/")) return "\uD83D\uDDBC\uFE0F";
+    if (mime.startsWith("video/")) return "\uD83C\uDFAC";
+    if (mime.startsWith("audio/")) return "\uD83C\uDFB5";
+    if (mime.includes("pdf")) return "\uD83D\uDCC4";
+    if (mime.includes("zip") || mime.includes("rar") || mime.includes("7z")) return "\uD83D\uDDC4\uFE0F";
+    if (mime.includes("word") || mime.includes("document")) return "\uD83D\uDCC3";
+    if (mime.includes("sheet") || mime.includes("excel")) return "\uD83D\uDCCA";
+    if (mime.includes("presentation") || mime.includes("powerpoint")) return "\uD83D\uDCCA";
+    return "\uD83D\uDCC1";
+  }
+  function formatFileSize(bytes) {
+    if (!bytes) return "";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+
+  function renderAttachment(msg) {
+    const baseUrl = "";
+    const url = baseUrl + msg.fileUrl;
+    if (msg.fileType === "image") {
+      return `<div class="msg-attachment"><img src="${url}" alt="${esc(msg.fileName)}" onclick="window.open('${url}','_blank')" title="Click to open full size" loading="lazy" /></div>`;
+    }
+    if (msg.fileType === "video") {
+      return `<div class="msg-attachment"><video controls preload="metadata" src="${url}"></video></div>`;
+    }
+    if (msg.fileType === "audio") {
+      return `<div class="msg-attachment"><audio controls preload="metadata" src="${url}"></audio></div>`;
+    }
+    return `<a class="msg-file-card" href="${url}" target="_blank" download="${esc(msg.fileName)}">
+      <span class="fc-icon">${getFileIcon(msg.fileMime)}</span>
+      <div>
+        <div class="fc-name">${esc(msg.fileName)}</div>
+        <div class="fc-size">${formatFileSize(msg.fileSize)}</div>
+      </div>
+      <span class="fc-dl">&#11015;</span>
+    </a>`;
+  }
+
+  function renderMentions(text) {
+    // Replace @username with highlighted spans
+    if (!activeRoom) return esc(text);
+    const participants = activeRoom.participants || [];
+    let result = esc(text);
+    // Style forwarded label
+    result = result.replace(/^\[Forwarded from (.+?)\]\n?/i, '<span style="font-size:11px;color:#99aaff;font-weight:600;display:block;margin-bottom:2px">↪ Forwarded from $1</span>');
+    participants.forEach(p => {
+      const pname = p.username || "";
+      if (!pname) return;
+      const regex = new RegExp("@" + pname.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+      result = result.replace(regex, `<span class="mention">@${esc(pname)}</span>`);
+    });
+    // Also highlight @nerd
+    result = result.replace(/@nerd\b/gi, '<span class="mention" style="background:rgba(88,101,242,0.3)">@nerd</span>');
+    return result;
+  }
+
+  function renderMessage(msg) {
+    const el = document.getElementById("messages");
+    const welcome = el.querySelector(".welcome-msg");
+    if (welcome) welcome.remove();
+
+    const div = document.createElement("div");
+    div.className = "msg";
+    div.setAttribute("data-msg-id", msg._id);
+    if (msg.senderId) div.setAttribute("data-sender-id", msg.senderId);
+    if (msg.pinned) div.style.borderLeft = "3px solid #f5c842";
+
+    // Reply quote
+    let replyHtml = "";
+    if (msg.replyTo) {
+      const rText = msg.replyTo.text || (msg.replyTo.fileName ? ("📎 " + msg.replyTo.fileName) : "");
+      replyHtml = `<div class="msg-reply-quote" onclick="scrollToMessage('${msg.replyTo._id}')">
+        <div class="rq-author">${esc(msg.replyTo.sender)}</div>
+        <div class="rq-text">${esc(rText)}</div>
+      </div>`;
+    }
+
+    const textHtml = msg.text ? `<div class="text" id="text-${msg._id}">${renderMentions(msg.text)}</div>` : "";
+    const attachHtml = msg.fileUrl ? renderAttachment(msg) : "";
+    const isPinned = msg.pinned;
+    const isEdited = msg.edited;
+
+    // Determine action buttons
+    const isMine = msg.senderId && msg.senderId === currentUser._id;
+    let hostId = null, isHost = false, isCoHost = false;
+    if (activeRoom) {
+      hostId = activeRoom.host ? (activeRoom.host._id || activeRoom.host) : null;
+      isHost = hostId === currentUser._id;
+      isCoHost = (activeRoom.coHosts || []).some(c => (c._id || c) === currentUser._id);
+    }
+    const canDelete = isMine || isHost || isCoHost;
+    const canEdit = isMine && msg.text;
+
+    // Get sender profile pic
+    const senderPic = msg.senderPic || null;
+    const isNerdSender = (msg.sender || "").toLowerCase() === "nerd";
+    const avatarHtml = isNerdSender
+      ? `<div class="avatar" style="width:28px;height:28px;font-size:16px;flex-shrink:0;background:rgba(88,101,242,0.3)">🤖</div>`
+      : senderPic
+        ? `<div class="avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;cursor:pointer" onclick="openPicViewer('${senderPic}','${esc(msg.sender)}')"><img class="avatar-img" src="${senderPic}" alt="" /></div>`
+        : `<div class="avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0">${(msg.sender||"?").charAt(0).toUpperCase()}</div>`;
+    const nerdBadgeHtml = isNerdSender ? '<span class="nerd-badge">AI</span>' : '';
+
+    div.innerHTML = `
+      <div class="msg-actions">
+        <button class="msg-action-btn" onclick="startReply('${msg._id}','${esc(msg.sender)}','${esc((msg.text||'').substring(0,80).replace(/'/g,"\\\'"))}','${esc((msg.fileName||'').replace(/'/g,"\\\'")||'')}')" title="Reply">&#8617;</button>
+        <button class="msg-action-btn" onclick="openForwardModal('${msg._id}','${esc(msg.sender)}','${esc((msg.text||msg.fileName||'').substring(0,80).replace(/'/g,"\\\'"))}')" title="Forward">&#10150;</button>
+        <button class="msg-action-btn ${isPinned ? 'pin-active' : ''}" onclick="${isPinned ? `unpinMsg('${msg._id}')` : `pinMsg('${msg._id}')`}" title="${isPinned ? 'Unpin' : 'Pin'}">&#128204;</button>
+        ${canEdit ? `<button class="msg-action-btn" onclick="startEditMsg('${msg._id}')" title="Edit">&#9998;</button>` : ''}
+        ${canDelete ? `<button class="msg-action-btn" onclick="doDeleteMsg('${msg._id}')" title="Delete" style="color:var(--red)">&#128465;</button>` : ''}
+      </div>
+      ${replyHtml}
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        ${avatarHtml}
+        <div style="flex:1;min-width:0">
+          <div class="msg-header">
+            <span class="username">${esc(msg.sender)}</span>${nerdBadgeHtml}
+            <span class="timestamp">${formatTime(msg.createdAt)}</span>
+            ${isEdited ? '<span class="edited-label">(edited)</span>' : ''}
+            ${isPinned ? '<span style="font-size:11px;color:#f5c842;margin-left:4px">📌 pinned</span>' : ''}
+          </div>
+          ${textHtml}
+          <div class="msg-edit-area" id="edit-area-${msg._id}">
+            <input id="edit-input-${msg._id}" value="" />
+            <button class="msg-edit-btn msg-edit-save" onclick="saveEditMsg('${msg._id}')">Save</button>
+            <button class="msg-edit-btn msg-edit-cancel" onclick="cancelEditMsg('${msg._id}')">Cancel</button>
+          </div>
+          ${attachHtml}
+        </div>
+      </div>
+    `;
+    el.appendChild(div);
+    requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+  }
+
+  function scrollToMessage(msgId) {
+    const target = document.querySelector(`[data-msg-id="${msgId}"]`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      target.style.background = "rgba(255,255,255,.1)";
+      setTimeout(() => { target.style.background = ""; }, 1500);
+    }
+  }
+
+  function renderError(text) {
+    const el = document.getElementById("messages");
+    const div = document.createElement("div");
+    div.className = "msg-error";
+    div.textContent = text;
+    el.appendChild(div);
+    requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+  }
+
+  /* ---- Socket events ---- */
+  socket.on("chatHistory", (messages) => {
+    const el = document.getElementById("messages");
+    el.innerHTML = "";
+    if (messages.length === 0) {
+      el.innerHTML = '<div class="welcome-msg">No messages yet &mdash; be the first!</div>';
+    } else {
+      messages.forEach(renderMessage);
+    }
+  });
+
+  socket.on("receiveMessage", (msg) => { renderMessage(msg); });
+  socket.on("error", (errMsg) => { renderError("Error: " + errMsg); });
+
+  socket.on("memberUpdate", (data) => {
+    if (activeRoom && activeRoom.roomCode === data.roomCode) {
+      activeRoom.participants = data.participants;
+      if (data.coHosts !== undefined) activeRoom.coHosts = data.coHosts;
+      renderMembers();
+    }
+    const room = rooms.find(r => r.roomCode === data.roomCode);
+    if (room) {
+      room.participants = data.participants;
+      if (data.coHosts !== undefined) room.coHosts = data.coHosts;
+    }
+  });
+
+  socket.on("kicked", async (data) => {
+    if (activeRoom && (activeRoom.roomCode === data.roomCode || activeRoom._id === data.roomId)) {
+      socket.emit("leaveRoom", activeRoom.roomCode);
+      resetChatArea();
+    }
+    await loadRooms();
+    alert("You have been removed from a room.");
+  });
+
+  socket.on("roomDeleted", async (data) => {
+    if (activeRoom && activeRoom.roomCode === data.roomCode) {
+      resetChatArea();
+    }
+    await loadRooms();
+  });
+
+  // Real-time join request notification for hosts
+  socket.on("joinRequest", async (data) => {
+    if (activeRoom && activeRoom._id === data.roomId) {
+      await loadJoinRequests(data.roomId);
+    }
+  });
+
+  // When a request is approved (for the requester)
+  socket.on("requestApproved", async (data) => {
+    await loadRooms();
+    // If viewing this public room, auto-select it
+    if (viewingPublicRoom && viewingPublicRoom.room._id === data.roomId) {
+      const myRoom = rooms.find(r => r._id === data.roomId);
+      if (myRoom) selectRoom(myRoom._id);
+    }
+  });
+
+  socket.on("requestRejected", (data) => {
+    alert(`Your request to join "${data.roomName}" was declined.`);
+  });
+
+  socket.on("roomPicUpdated", (data) => {
+    if (activeRoom && activeRoom.roomCode === data.roomCode) {
+      activeRoom.roomPic = data.roomPic;
+      updateTopbarRoomPic();
+    }
+    const room = rooms.find(r => r.roomCode === data.roomCode);
+    if (room) room.roomPic = data.roomPic;
+    renderRoomList();
+  });
+
+  /* ========== PRESENCE ========== */
+  socket.on("presenceUpdate", (data) => {
+    if (activeRoom && activeRoom.roomCode === data.roomCode) {
+      // Detect newly joined users
+      const oldUserIds = new Set(onlineUsers.map(u => u.userId));
+      data.users.forEach(u => {
+        if (!oldUserIds.has(u.userId) && u.userId !== currentUser._id && onlineUsers.length > 0) {
+          showJoinMessage(u.username);
+        }
+      });
+      onlineUsers = data.users;
+      renderMembers();
+    }
+  });
+
+  /* ========== TYPING INDICATOR ========== */
+  socket.on("userTyping", ({ username }) => {
+    if (typingUsers[username]) clearTimeout(typingUsers[username]);
+    typingUsers[username] = setTimeout(() => {
+      delete typingUsers[username];
+      renderTypingBar();
+    }, 3000);
+    renderTypingBar();
+  });
+  socket.on("userStopTyping", ({ username }) => {
+    delete typingUsers[username];
+    renderTypingBar();
+  });
+
+  /* ---- User join system message in chat ---- */
+  function showJoinMessage(username) {
+    const el = document.getElementById("messages");
+    const div = document.createElement("div");
+    div.className = "msg-system";
+    div.innerHTML = `<span class="sys-icon">&#x2192;</span> <strong>${esc(username)}</strong> joined the room`;
+    el.appendChild(div);
+    requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+    showToast(`${username} joined the room`);
+  }
+
+  /* ---- Toast notification ---- */
+  function showToast(text) {
+    const toast = document.createElement("div");
+    toast.className = "toast-notification";
+    toast.textContent = text;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add("exit");
+      setTimeout(() => toast.remove(), 300);
+    }, 2500);
+  }
+
+  function renderTypingBar() {
+    const bar = document.getElementById("typing-bar");
+    const names = Object.keys(typingUsers);
+    if (names.length === 0) { bar.innerHTML = ""; return; }
+    const dots = '<span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+    if (names.length === 1) {
+      bar.innerHTML = `<strong>${esc(names[0])}</strong> is typing ${dots}`;
+    } else if (names.length === 2) {
+      bar.innerHTML = `<strong>${esc(names[0])}</strong> and <strong>${esc(names[1])}</strong> are typing ${dots}`;
+    } else {
+      bar.innerHTML = `<strong>${names.length} people</strong> are typing ${dots}`;
+    }
+  }
+
+  /* ========== REPLY ========== */
+  window.startReply = function (msgId, sender, text, fileName) {
+    replyingTo = { _id: msgId, sender, text, fileName };
+    document.getElementById("reply-author").textContent = sender;
+    document.getElementById("reply-text").textContent = text || ("📎 " + fileName);
+    document.getElementById("reply-bar").classList.add("active");
+    document.getElementById("message-input").focus();
+  };
+
+  window.cancelReply = function () {
+    replyingTo = null;
+    document.getElementById("reply-bar").classList.remove("active");
+  };
+
+  /* ========== EDIT / DELETE MESSAGES ========== */
+  window.startEditMsg = function (msgId) {
+    const textEl = document.getElementById("text-" + msgId);
+    const editArea = document.getElementById("edit-area-" + msgId);
+    const editInput = document.getElementById("edit-input-" + msgId);
+    if (!textEl || !editArea || !editInput) return;
+    editInput.value = textEl.textContent;
+    textEl.style.display = "none";
+    editArea.classList.add("active");
+    editInput.focus();
+    editInput.addEventListener("keydown", function handler(e) {
+      if (e.key === "Enter") { e.preventDefault(); saveEditMsg(msgId); editInput.removeEventListener("keydown", handler); }
+      if (e.key === "Escape") { cancelEditMsg(msgId); editInput.removeEventListener("keydown", handler); }
+    });
+  };
+
+  window.saveEditMsg = function (msgId) {
+    const editInput = document.getElementById("edit-input-" + msgId);
+    if (!editInput) return;
+    const newText = editInput.value.trim();
+    if (!newText) return;
+    socket.emit("editMessage", { messageId: msgId, newText, userId: currentUser._id });
+    cancelEditMsg(msgId);
+  };
+
+  window.cancelEditMsg = function (msgId) {
+    const textEl = document.getElementById("text-" + msgId);
+    const editArea = document.getElementById("edit-area-" + msgId);
+    if (textEl) textEl.style.display = "";
+    if (editArea) editArea.classList.remove("active");
+  };
+
+  window.doDeleteMsg = function (msgId) {
+    if (!confirm("Delete this message?")) return;
+    socket.emit("deleteMessage", { messageId: msgId, userId: currentUser._id });
+  };
+
+  /* ========== FORWARD MESSAGE ========== */
+  let forwardingMessageId = null;
+  let forwardSelectedRooms = new Set();
+
+  window.openForwardModal = function (msgId, sender, preview) {
+    forwardingMessageId = msgId;
+    forwardSelectedRooms.clear();
+    document.getElementById("forward-preview-sender").textContent = sender;
+    document.getElementById("forward-preview-text").textContent = preview || "(attachment)";
+    updateForwardSendBtn();
+
+    // Populate room list (exclude current room)
+    const list = document.getElementById("forward-room-list");
+    const otherRooms = rooms.filter(r => !activeRoom || r._id !== activeRoom._id);
+    if (otherRooms.length === 0) {
+      list.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">No other rooms to forward to</div>';
+    } else {
+      list.innerHTML = otherRooms.map(r => {
+        const picHtml = r.roomPic
+          ? `<div class="fr-icon"><img src="${r.roomPic}" alt="" /></div>`
+          : `<div class="fr-icon">#</div>`;
+        return `
+          <div class="forward-room-item" data-room-code="${r.roomCode}" onclick="toggleForwardRoom(this, '${r.roomCode}')">
+            ${picHtml}
+            <div style="flex:1;min-width:0">
+              <div class="fr-name">${esc(r.roomName)}</div>
+              <div class="fr-code">${esc(r.roomCode)}</div>
+            </div>
+            <div class="fr-check">✓</div>
+          </div>
+        `;
+      }).join("");
+    }
+    document.getElementById("modal-forward").classList.add("open");
+  };
+
+  window.toggleForwardRoom = function (el, roomCode) {
+    if (forwardSelectedRooms.has(roomCode)) {
+      forwardSelectedRooms.delete(roomCode);
+      el.classList.remove("selected");
+    } else {
+      forwardSelectedRooms.add(roomCode);
+      el.classList.add("selected");
+    }
+    updateForwardSendBtn();
+  };
+
+  function updateForwardSendBtn() {
+    const btn = document.getElementById("forward-send-btn");
+    const count = forwardSelectedRooms.size;
+    btn.disabled = count === 0;
+    btn.textContent = count === 0 ? "Forward" : `Forward to ${count} room${count > 1 ? 's' : ''}`;
+  }
+
+  window.doForwardToSelected = function () {
+    if (!forwardingMessageId || !currentUser || forwardSelectedRooms.size === 0) return;
+    const targetRoomCodes = Array.from(forwardSelectedRooms);
+    socket.emit("forwardMessage", {
+      messageId: forwardingMessageId,
+      targetRoomCodes,
+      userId: currentUser._id
+    });
+    closeModals();
+    forwardingMessageId = null;
+    forwardSelectedRooms.clear();
+  };
+
+  socket.on("forwardSuccess", ({ targetRoomCodes }) => {
+    // Brief visual feedback
+    const names = (targetRoomCodes || []).map(code => {
+      const room = rooms.find(r => r.roomCode === code);
+      return room ? room.roomName : code;
+    });
+    const el = document.getElementById("messages");
+    const toast = document.createElement("div");
+    toast.style.cssText = "text-align:center;padding:6px;font-size:12px;color:var(--text-muted);animation:fadeSlideIn .2s ease-out";
+    toast.textContent = names.length === 1 ? `✓ Forwarded to ${names[0]}` : `✓ Forwarded to ${names.length} rooms`;
+    el.appendChild(toast);
+    requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+    setTimeout(() => toast.remove(), 3000);
+  });
+
+  socket.on("messageEdited", (msg) => {
+    const el = document.querySelector(`[data-msg-id="${msg._id}"]`);
+    if (el) {
+      const textEl = el.querySelector(`#text-${msg._id}`);
+      if (textEl) textEl.innerHTML = renderMentions(msg.text);
+      // Add edited label if not already there
+      const header = el.querySelector('.msg-header');
+      if (header && !header.querySelector('.edited-label')) {
+        const span = document.createElement('span');
+        span.className = 'edited-label';
+        span.textContent = '(edited)';
+        header.appendChild(span);
+      }
+    }
+  });
+
+  socket.on("messageDeleted", ({ messageId }) => {
+    const el = document.querySelector(`[data-msg-id="${messageId}"]`);
+    if (el) el.remove();
+    // Also remove from pinned if it was pinned
+    pinnedMessages = pinnedMessages.filter(m => m._id !== messageId);
+    renderPinnedBadge();
+    if (document.getElementById("pinned-panel").classList.contains("open")) renderPinnedList();
+  });
+
+  /* ========== @MENTION AUTOCOMPLETE ========== */
+  const msgInput = document.getElementById("message-input");
+  const mentionDropdown = document.getElementById("mention-dropdown");
+
+  function getMentionContext() {
+    const val = msgInput.value;
+    const pos = msgInput.selectionStart;
+    // Find the @ before the cursor
+    const before = val.substring(0, pos);
+    const atIdx = before.lastIndexOf("@");
+    if (atIdx === -1) return null;
+    // Must be at start or preceded by space
+    if (atIdx > 0 && before[atIdx - 1] !== " " && before[atIdx - 1] !== "\n") return null;
+    const search = before.substring(atIdx + 1);
+    // No spaces in search
+    if (search.includes(" ")) return null;
+    return { atIdx, search: search.toLowerCase() };
+  }
+
+  function updateMentionDropdown() {
+    const ctx = getMentionContext();
+    if (!ctx || !activeRoom) {
+      mentionDropdown.classList.remove("open");
+      mentionActive = false;
+      return;
+    }
+    const participants = activeRoom.participants || [];
+    const matches = participants.filter(p => {
+      const pname = (p.username || "").toLowerCase();
+      const pid = p._id || p;
+      return pname.includes(ctx.search) && pid !== currentUser._id;
+    });
+    // Add @nerd bot option
+    if ("nerd".includes(ctx.search)) {
+      const alreadyHasNerd = matches.some(m => (m.username || "").toLowerCase() === "nerd");
+      if (!alreadyHasNerd) {
+        matches.push({ username: "nerd", profilePic: null, _isNerd: true });
+      }
+    }
+    if (matches.length === 0) {
+      mentionDropdown.classList.remove("open");
+      mentionActive = false;
+      return;
+    }
+    mentionActive = true;
+    mentionIndex = Math.min(mentionIndex, matches.length - 1);
+    mentionDropdown.innerHTML = matches.map((p, i) => {
+      const pname = p.username || "Unknown";
+      const ppic = p.profilePic || null;
+      const isNerd = p._isNerd || pname.toLowerCase() === "nerd";
+      const avatarInner = isNerd
+        ? '🤖'
+        : ppic
+          ? `<img class="avatar-img" src="${ppic}" alt="" />`
+          : pname.charAt(0).toUpperCase();
+      const badge = isNerd ? '<span class="nerd-badge">AI</span>' : '';
+      return `
+        <div class="mention-option ${i === mentionIndex ? 'active' : ''}" onmousedown="completeMention('${esc(pname)}')">
+          <div class="avatar" style="width:24px;height:24px;font-size:10px">${avatarInner}</div>
+          <span class="mo-name">${esc(pname)}</span>${badge}
+        </div>
+      `;
+    }).join("");
+    mentionDropdown.classList.add("open");
+  }
+
+  window.completeMention = function (username) {
+    const ctx = getMentionContext();
+    if (!ctx) return;
+    const val = msgInput.value;
+    const before = val.substring(0, ctx.atIdx);
+    const after = val.substring(msgInput.selectionStart);
+    msgInput.value = before + "@" + username + " " + after;
+    mentionDropdown.classList.remove("open");
+    mentionActive = false;
+    msgInput.focus();
+    const newPos = (before + "@" + username + " ").length;
+    msgInput.setSelectionRange(newPos, newPos);
+  };
+
+  msgInput.addEventListener("input", () => {
+    if (!activeRoom || !currentUser) return;
+    updateMentionDropdown();
+    socket.emit("typing", { roomCode: activeRoom.roomCode, username: currentUser.username });
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      socket.emit("stopTyping", { roomCode: activeRoom.roomCode, username: currentUser.username });
+    }, 2000);
+  });
+  window.pinMsg = function (msgId) {
+    if (!currentUser) return;
+    socket.emit("pinMessage", { messageId: msgId, userId: currentUser._id });
+  };
+  window.unpinMsg = function (msgId) {
+    socket.emit("unpinMessage", { messageId: msgId });
+  };
+
+  socket.on("pinnedMessages", (msgs) => {
+    pinnedMessages = msgs;
+    renderPinnedBadge();
+  });
+
+  socket.on("messagePinned", (msg) => {
+    // Update in pinnedMessages list
+    pinnedMessages = pinnedMessages.filter(m => m._id !== msg._id);
+    pinnedMessages.unshift(msg);
+    renderPinnedBadge();
+    renderPinnedList();
+    // Update message in chat
+    const el = document.querySelector(`[data-msg-id="${msg._id}"]`);
+    if (el) {
+      el.style.borderLeft = "3px solid #f5c842";
+      // Update pin button
+      const pinBtn = el.querySelector('.msg-action-btn:nth-child(3)');
+      if (pinBtn) { pinBtn.classList.add('pin-active'); pinBtn.setAttribute('onclick', `unpinMsg('${msg._id}')`); pinBtn.title = 'Unpin'; }
+      // Add pinned label
+      const header = el.querySelector('.msg-header');
+      if (header && !header.querySelector('.pin-label')) {
+        const span = document.createElement('span');
+        span.className = 'pin-label';
+        span.style.cssText = 'font-size:11px;color:#f5c842;margin-left:4px';
+        span.textContent = '📌 pinned';
+        header.appendChild(span);
+      }
+    }
+  });
+
+  socket.on("messageUnpinned", ({ messageId }) => {
+    pinnedMessages = pinnedMessages.filter(m => m._id !== messageId);
+    renderPinnedBadge();
+    renderPinnedList();
+    const el = document.querySelector(`[data-msg-id="${messageId}"]`);
+    if (el) {
+      el.style.borderLeft = "";
+      const pinBtn = el.querySelector('.msg-action-btn:nth-child(3)');
+      if (pinBtn) { pinBtn.classList.remove('pin-active'); pinBtn.setAttribute('onclick', `pinMsg('${messageId}')`); pinBtn.title = 'Pin'; }
+      const label = el.querySelector('.pin-label');
+      if (label) label.remove();
+    }
+  });
+
+  function renderPinnedBadge() {
+    const badge = document.getElementById("pin-badge");
+    if (pinnedMessages.length > 0) {
+      badge.style.display = "";
+      badge.textContent = pinnedMessages.length;
+    } else {
+      badge.style.display = "none";
+    }
+  }
+
+  window.togglePinnedPanel = function () {
+    const panel = document.getElementById("pinned-panel");
+    panel.classList.toggle("open");
+    if (panel.classList.contains("open")) renderPinnedList();
+  };
+
+  function renderPinnedList() {
+    const list = document.getElementById("pinned-list");
+    if (pinnedMessages.length === 0) {
+      list.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center;">No pinned messages</div>';
+      return;
+    }
+    list.innerHTML = pinnedMessages.map(m => `
+      <div class="pinned-item">
+        <div class="pi-author">${esc(m.sender)}</div>
+        ${m.text ? `<div class="pi-text">${esc(m.text)}</div>` : ''}
+        ${m.fileName ? `<div class="pi-file">📎 ${esc(m.fileName)}</div>` : ''}
+        <div class="pi-meta">
+          <span>${formatTime(m.createdAt)}</span>
+          <button class="unpin-btn" onclick="unpinMsg('${m._id}')">Unpin</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  /* Close modals on overlay click */
+  document.querySelectorAll(".modal-overlay").forEach(overlay => {
+    overlay.addEventListener("click", e => {
+      if (e.target === overlay) closeModals();
+    });
+  });
+
+  // Close mention dropdown on click outside
+  document.addEventListener("click", (e) => {
+    if (!mentionDropdown.contains(e.target) && e.target !== msgInput) {
+      mentionDropdown.classList.remove("open");
+      mentionActive = false;
+    }
+  });
+
+  /* ========== SESSION RESTORE ========== */
+  (function restoreSession() {
+    try {
+      const saved = localStorage.getItem("studyroom_user");
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        enterApp();
+      }
+    } catch (e) { localStorage.removeItem("studyroom_user"); }
+  })();
+
+  /* ========== TAB CLOSE CONFIRMATION ========== */
+  window.addEventListener("beforeunload", (e) => {
+    if (currentUser) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  });
+
+})();
+
+/* ========== THUNDER/LIGHTNING BACKGROUND ========== */
+(function initLightning() {
+  const canvas = document.getElementById("lightning-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  let w, h;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    generateBolts(); // regenerate on resize
+  }
+
+  // Pre-generate fixed diagonal bolt paths so they stay constant
+  let boltPaths = [];
+
+  function generateBoltPath(startX, startY, angle, segments) {
+    const points = [{ x: startX, y: startY }];
+    let x = startX, y = startY, a = angle;
+    for (let i = 0; i < segments; i++) {
+      const len = 25 + Math.random() * 50;
+      a += (Math.random() - 0.5) * 0.6;
+      x += Math.cos(a) * len;
+      y += Math.sin(a) * len;
+      points.push({ x, y });
+    }
+    return points;
+  }
+
+  function generateBranch(parentPoints, branchIdx, angle) {
+    const pt = parentPoints[branchIdx];
+    return generateBoltPath(pt.x, pt.y, angle, 3 + Math.floor(Math.random() * 4));
+  }
+
+  function generateBolts() {
+    boltPaths = [];
+    // Create 4-6 permanent diagonal bolts spread across the screen
+    const count = 4 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < count; i++) {
+      const startX = (w * (i + 0.5)) / count + (Math.random() - 0.5) * (w / count) * 0.6;
+      const startY = -10;
+      // Diagonal angle: mostly downward with some spread
+      const angle = Math.PI / 2 + (Math.random() - 0.5) * 0.7;
+      const segments = 8 + Math.floor(Math.random() * 8);
+      const mainPath = generateBoltPath(startX, startY, angle, segments);
+
+      const branches = [];
+      // Add 2-4 sub-branches per bolt
+      const branchCount = 2 + Math.floor(Math.random() * 3);
+      for (let b = 0; b < branchCount; b++) {
+        const idx = 2 + Math.floor(Math.random() * (mainPath.length - 3));
+        const bAngle = angle + (Math.random() - 0.5) * 1.4;
+        branches.push(generateBranch(mainPath, idx, bAngle));
+      }
+
+      boltPaths.push({
+        main: mainPath,
+        branches,
+        phaseOffset: Math.random() * Math.PI * 2,
+        glowSpeed: 0.8 + Math.random() * 1.2
+      });
+    }
+  }
+
+  resize();
+  window.addEventListener("resize", resize);
+
+  function drawPath(points, alpha, lineW, glowSize, glowAlpha) {
+    if (points.length < 2) return;
+
+    // Outer glow
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.strokeStyle = `rgba(140, 150, 220, ${glowAlpha})`;
+    ctx.lineWidth = lineW + glowSize;
+    ctx.shadowColor = `rgba(130, 140, 210, ${glowAlpha * 0.8})`;
+    ctx.shadowBlur = glowSize * 3;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.stroke();
+
+    // Core line
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.strokeStyle = `rgba(200, 205, 255, ${alpha})`;
+    ctx.lineWidth = lineW;
+    ctx.shadowColor = `rgba(180, 185, 255, ${alpha * 0.6})`;
+    ctx.shadowBlur = 8;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, w, h);
+    const time = Date.now() * 0.001;
+
+    boltPaths.forEach(bolt => {
+      // Pulsing glow: oscillates between dim and bright
+      const pulse = 0.5 + 0.5 * Math.sin(time * bolt.glowSpeed + bolt.phaseOffset);
+      const baseAlpha = 0.08 + pulse * 0.18;
+      const glowAlpha = 0.04 + pulse * 0.12;
+      const glowSize = 4 + pulse * 10;
+
+      // Draw main bolt
+      drawPath(bolt.main, baseAlpha, 1.2 + pulse * 0.8, glowSize, glowAlpha);
+
+      // Draw branches (dimmer)
+      bolt.branches.forEach(branch => {
+        drawPath(branch, baseAlpha * 0.5, 0.6 + pulse * 0.4, glowSize * 0.6, glowAlpha * 0.4);
+      });
+    });
+
+    // Subtle ambient glow around bolt origins
+    boltPaths.forEach(bolt => {
+      const pulse = 0.5 + 0.5 * Math.sin(time * bolt.glowSpeed * 0.7 + bolt.phaseOffset);
+      const pt = bolt.main[Math.floor(bolt.main.length / 2)];
+      const grad = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 150 + pulse * 80);
+      grad.addColorStop(0, `rgba(100, 110, 180, ${0.012 + pulse * 0.015})`);
+      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(pt.x - 250, pt.y - 250, 500, 500);
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+})();
+</script>
+</body>
+</html>
