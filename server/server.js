@@ -22,8 +22,15 @@ const User = require("./models/User");
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const app = express();
+const client = require('prom-client');
+client.collectDefaultMetrics();
+
 
 connectDB();
+const httpRequestsTotal = new client.Counter({
+    name: 'http_requests_total',
+    help: 'Total number of HTTP requests',
+});
 
 // --- Nerd Bot: ensure bot user exists ---
 let nerdBotUser = null;
@@ -84,6 +91,10 @@ async function generateNerdReply(userMessage, recentMessages) {
 
 app.use(cors());
 app.use(express.json());
+app.use((req, res, next) => {
+    httpRequestsTotal.inc();
+    next();
+});
 
 // ---- Static file serving for uploads ----
 const uploadsDir = path.join(__dirname, "uploads");
@@ -113,7 +124,10 @@ function getFileType(mime) {
   if (mime.startsWith("audio/")) return "audio";
   return "document";
 }
-
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', client.register.contentType);
+    res.end(await client.register.metrics());
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomRoutes);
 
