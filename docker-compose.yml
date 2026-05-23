@@ -20,3 +20,21 @@ services:
     container_name: grafana
     ports:
       - "3000:3000"
+  
+  monitor:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.monitor
+    container_name: monitor-service
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  
+  controller:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.controller
+    container_name: controller-service
+    ports:
+      - "4000:4000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

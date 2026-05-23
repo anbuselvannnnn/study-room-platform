@@ -25,6 +25,7 @@ const app = express();
 const client = require('prom-client');
 client.collectDefaultMetrics();
 
+let lastRequestTime = Date.now();
 
 connectDB();
 const httpRequestsTotal = new client.Counter({
@@ -92,7 +93,19 @@ async function generateNerdReply(userMessage, recentMessages) {
 app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
-    httpRequestsTotal.inc();
+    const ignoredPaths = [
+        "/metrics",
+        "/server-status",
+        "/favicon.ico"
+    ];
+
+    if (!ignoredPaths.includes(req.path)) {
+        lastRequestTime = Date.now();
+        httpRequestsTotal.inc();
+
+        console.log("User activity detected:", req.path);
+    }
+
     next();
 });
 
@@ -130,6 +143,15 @@ app.get('/metrics', async (req, res) => {
 });
 app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomRoutes);
+
+app.get('/server-status', (req, res) => {
+    const inactiveTime = Math.floor((Date.now() - lastRequestTime) / 1000);
+
+    res.json({
+        status: "running",
+        inactiveForSeconds: inactiveTime
+    });
+});
 
 // ---- File upload endpoint ----
 app.post("/api/upload", upload.single("file"), async (req, res) => {
